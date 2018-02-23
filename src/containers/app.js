@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import { Header } from 'shared/components';
 import { Route, Switch } from 'react-router-dom';
 import { MainPage } from './Vehicle';
-import './app.scss';
 
 class App extends Component {
   render() {
@@ -10,6 +9,7 @@ class App extends Component {
       <div className="app">
         <Header />
         <Switch>
+          <Route path="/" component={MainPage} />
           <Route path="/vehicle">
             <Route path="/" component={MainPage} />
           </Route>
