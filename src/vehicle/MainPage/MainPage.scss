@@ -2,14 +2,14 @@
   border-bottom: none !important;
   h1 {
     height: 41px;
-    background: url(../../shared/assets/index_oglasi_logo.svg) no-repeat top
-      center;
+    background: url(/assets/index_oglasi_logo.svg) no-repeat top center;
     background-size: auto 41px;
-    margin: 90px 0 20px 0;
+    margin: 80px 0 20px 0;
   }
 }
 
 .categories-navbar {
+  overflow: hidden;
   ul {
     width: 100%;
   }
@@ -18,4 +18,8 @@
     width: 20%;
     text-align: center;
   }
+}
+
+.search-car {
+  margin-top: 20px;
 }

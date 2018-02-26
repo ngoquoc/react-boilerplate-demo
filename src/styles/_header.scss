@@ -1,5 +1,16 @@
-.nav {
-  .dropdown-menu {
-    right: auto !important;
+.logo {
+  width: 200px;
+  height: 20px;
+  margin: 20px;
+  background: url(/assets/index_oglasi_logo.svg) no-repeat top center;
+  background-size: auto 20px;
+  float: left;
+}
+
+.ant-menu.ant-menu-dark {
+  font-size: 16px;
+  li:hover,
+  .ant-menu-item:hover {
+    background-color: $primary-color;
   }
 }

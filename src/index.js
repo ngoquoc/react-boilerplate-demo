@@ -5,6 +5,7 @@ import { ConnectedRouter } from 'react-router-redux';
 
 import App from './app';
 import store, { history } from './store';
+import 'antd/dist/antd.css';
 
 import './styles/styles.scss';
 

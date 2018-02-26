@@ -1,11 +1,10 @@
 import React from 'react';
+import { Layout } from 'antd';
 const Footer = () => {
   return (
-    <footer>
-      <div className="container">
-        <h3>Footer</h3>
-      </div>
-    </footer>
+    <Layout.Footer style={{ textAlign: 'center' }}>
+      Index Oglasi ©2018 Created by 2Click Solutions
+    </Layout.Footer>
   );
 };
 

@@ -7,7 +7,8 @@ body {
   margin: 0;
   padding: 0;
   font-family: Roboto, sans-serif;
-  background-color: $bg-color;
+  background-color: #000 !important;
+  background: url(/assets/car-background.jpg) no-repeat top center;
 }
 
 .nav {
@@ -18,4 +19,8 @@ body {
 
 .content {
   min-height: 800px;
+}
+
+.ant-layout {
+  background-color: transparent;
 }
