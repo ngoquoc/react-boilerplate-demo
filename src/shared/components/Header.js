@@ -3,26 +3,35 @@ import { Nav, NavDropdown, MenuItem, Navbar, NavItem } from 'react-bootstrap';
 class Header extends React.Component {
   render() {
     return (
-      <Navbar>
+      <Navbar fixedTop>
         <Navbar.Header>
           <Navbar.Brand>
-            <a href="#home">React-Bootstrap</a>
+            <a href="#home">INDEX</a>
           </Navbar.Brand>
         </Navbar.Header>
-        <Nav>
-          <NavItem eventKey={1} href="#">
-            Link
-          </NavItem>
-          <NavItem eventKey={2} href="#">
-            Link
-          </NavItem>
-          <NavDropdown eventKey={3} title="Dropdown" id="basic-nav-dropdown">
-            <MenuItem eventKey={3.1}>Action</MenuItem>
-            <MenuItem eventKey={3.2}>Another action</MenuItem>
-            <MenuItem eventKey={3.3}>Something else here</MenuItem>
-            <MenuItem divider />
-            <MenuItem eventKey={3.4}>Separated link</MenuItem>
+        <Nav pullRight>
+          <NavDropdown eventKey={1} title="Search">
+            <MenuItem eventKey={1.1}>Used & New Cars</MenuItem>
+            <MenuItem eventKey={1.2}>Motorcycles</MenuItem>
+            <MenuItem eventKey={1.3}>Motorhomes & Caravans</MenuItem>
+            <MenuItem eventKey={1.4}>
+              Trucks, Commercial & Utility Vehicle
+            </MenuItem>
           </NavDropdown>
+          <NavDropdown eventKey={2} title="Sell">
+            <MenuItem eventKey={2.1}>Cars</MenuItem>
+            <MenuItem eventKey={2.2}>Motorcycles</MenuItem>
+            <MenuItem eventKey={2.3}>Motorhomes & Caravans</MenuItem>
+            <MenuItem eventKey={2.4}>
+              Trucks, Commercial & Utility Vehicle
+            </MenuItem>
+          </NavDropdown>
+          <NavItem eventKey={3} href="#">
+            Favorite
+          </NavItem>
+          <NavItem eventKey={4} href="#">
+            Login
+          </NavItem>
         </Nav>
       </Navbar>
     );

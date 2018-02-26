@@ -1,7 +1,5 @@
 import React from 'react';
-import { Header } from './Header';
-import { CategoriesNavbar } from './CategoriesNavbar';
-import { SearchCar } from './SearchCar';
+import { Header, CategoriesNavbar, SearchCar } from './components';
 import './MainPage.scss';
 
 export class MainPage extends React.Component {

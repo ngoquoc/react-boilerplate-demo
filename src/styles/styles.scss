@@ -1,9 +1,21 @@
-@import './variables';
+@import 'variables';
+@import 'header';
+@import 'footer';
 @import '~bootstrap-sass/assets/stylesheets/bootstrap';
 
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
-  background-color: orange;
+  font-family: Roboto, sans-serif;
+  background-color: $bg-color;
+}
+
+.nav {
+  li:hover {
+    background-color: #efefef;
+  }
+}
+
+.content {
+  min-height: 800px;
 }
