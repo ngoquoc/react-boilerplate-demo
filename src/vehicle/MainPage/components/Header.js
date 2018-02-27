@@ -1,6 +1,8 @@
 import React from 'react';
 import { PageHeader } from 'react-bootstrap';
 
-export const Header = () => {
+const Header = () => {
   return <PageHeader />;
 };
+
+export default Header;

@@ -1,5 +1,10 @@
 import React from 'react';
-import { Header, CategoriesNavbar, SearchCar } from './components';
+import {
+  Header,
+  CategoriesNavbar,
+  SearchCar,
+  CarListContainer,
+} from './components';
 import './MainPage.scss';
 
 class MainPage extends React.Component {
@@ -10,6 +15,7 @@ class MainPage extends React.Component {
         <div className="container">
           <CategoriesNavbar />
           <SearchCar />
+          <CarListContainer />
         </div>
       </div>
     );
