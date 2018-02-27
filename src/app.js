@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Header, Footer } from 'shared/components';
+import { Header, Footer } from './shared/components';
 import { Route, Switch } from 'react-router-dom';
 import { MainPage } from './vehicle';
-import { Layout, Content } from 'antd';
+import { Layout } from 'antd';
+
 class App extends Component {
   render() {
     return (

@@ -4,7 +4,7 @@ const CarItemDetail = () => {
   return (
     <Row gutter={12} className="car-item-detail">
       <Col span={6}>
-        <img src="/assets/no-image.jpg" />
+        <img src="assets/no-image.jpg" />
       </Col>
       <Col span={8} className="car-info">
         <span className="h4 title">

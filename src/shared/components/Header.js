@@ -5,7 +5,14 @@ class Header extends React.Component {
   render() {
     return (
       <Layout.Header>
-        <div className="logo" />
+        <div
+          className="logo"
+          style={{
+            background:
+              'url(assets/index_oglasi_logo.svg) no-repeat top center',
+            backgroundSize: 'auto 20px',
+          }}
+        />
         <Menu
           theme="dark"
           mode="horizontal"
