@@ -1,0 +1,10 @@
+.loader {
+  margin: auto;
+  width: 60px;
+  .ant-spin {
+    position: absolute;
+    display: block;
+    top: 50%;
+    margin-top: -20px;
+  }
+}
