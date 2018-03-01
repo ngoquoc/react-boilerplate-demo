@@ -5,6 +5,14 @@ const Network = resource => {
     return [config.apiServer, config.restApi, path].join('/');
   };
 
+  // Handler if request was fail
+  let handleErrors = response => {
+    if (!response.ok) {
+      throw response;
+    }
+    return response.json();
+  };
+
   // Default options used for every request
   const defaultOptions = {
     mode: 'cors',
@@ -30,11 +38,11 @@ const Network = resource => {
           method: 'POST',
           body: JSON.stringify(body),
         }),
-      );
+      ).then(handleErrors);
     },
 
     /**
-     * @function post
+     * @function get
      * @description Make a GET request.
      * @param {string} path
      * @param {object} options
@@ -44,7 +52,7 @@ const Network = resource => {
       return fetch(
         buildURL(path),
         Object.assign(options, defaultOptions, { method: 'GET' }),
-      );
+      ).then(handleErrors);
     },
 
     /**
@@ -59,7 +67,7 @@ const Network = resource => {
       return fetch(
         buildURL(path),
         Object.assign(options, defaultOptions, { method: 'PUT' }),
-      );
+      ).then(handleErrors);
     },
 
     /**
@@ -73,7 +81,7 @@ const Network = resource => {
       return fetch(
         buildURL(path),
         Object.assign(options, defaultOptions, { method: 'DELETE' }),
-      );
+      ).then(handleErrors);
     },
   };
 };

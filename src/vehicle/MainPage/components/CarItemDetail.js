@@ -1,27 +1,26 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Row, Col, Button } from 'antd';
-const CarItemDetail = () => {
+
+const propTypes = { item: PropTypes.object };
+const CarItemDetail = ({ item }) => {
   return (
     <Row gutter={12} className="car-item-detail">
       <Col span={6}>
-        <img src="assets/no-image.jpg" />
+        <img src={item.ImageLink ? item.ImageLink : 'assets/no-image.jpg'} />
       </Col>
       <Col span={8} className="car-info">
-        <span className="h4 title">
-          Audi S5 Sportback 3.0 TFSI qu. tiptr. MATRIX S-SITZE
-        </span>
-        <div className="info">
-          FR 06/2017, 6,825 km, 260 kW (354 PS) Saloon, Petrol, Automatic
-          transmission, HU 06/2020, 4/5 Doors ≈ 7.4 l/100km (comb.), ≈ 170 g
-          CO₂/km (comb.)
-        </div>
+        <span className="h4 title">{item.Title}</span>
+        <div className="info">Make: {item.Make}</div>
+        <div className="info">Make: {item.Model}</div>
+        <div className="info">{item.OtherDescription}</div>
       </Col>
       <Col span={4} className="price">
-        <span className="h4">€59,950</span>
+        <span className="h4">{item.MainPrice} €</span>
       </Col>
       <Col span={6} className="vendor-info">
-        <span className="h4 vendor-name">Audi</span>
-        <div>Adress: ...</div>
+        <span className="h4 vendor-name">{item.SeoName}</span>
+        <div>Adress: {item.Address}</div>
       </Col>
       <div className="action-box">
         <Button type="primary">Contact</Button>
@@ -30,5 +29,7 @@ const CarItemDetail = () => {
     </Row>
   );
 };
+
+CarItemDetail.propTypes = propTypes;
 
 export default CarItemDetail;

@@ -1,5 +1,5 @@
 import { combineReducers } from 'redux';
-import { mainPageReducer } from './MainPage/reducers/mainPageReducer';
+import mainPageReducer from './MainPage/reducer/mainPageReducer';
 const vehicleReducer = combineReducers({ mainPage: mainPageReducer });
 
 export default vehicleReducer;
