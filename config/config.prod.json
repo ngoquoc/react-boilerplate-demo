@@ -1,0 +1,4 @@
+{
+  "apiServer": "zod.2cs.local:8081",
+  "restApi": "vehicle/api"
+}

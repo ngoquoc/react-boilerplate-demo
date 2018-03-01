@@ -1,15 +1,14 @@
 import React from 'react';
-import { PageHeader } from 'react-bootstrap';
 
 const Header = () => {
   return (
-    <PageHeader>
+    <div className="page-header">
       <h1
         style={{
           background: 'url(assets/index_oglasi_logo.svg) no-repeat top center',
         }}
       />
-    </PageHeader>
+    </div>
   );
 };
 

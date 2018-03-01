@@ -17,7 +17,7 @@ const CarItemDetail = () => {
         </div>
       </Col>
       <Col span={4} className="price">
-        <span class="h4">€59,950</span>
+        <span className="h4">€59,950</span>
       </Col>
       <Col span={6} className="vendor-info">
         <span className="h4 vendor-name">Audi</span>

@@ -22,6 +22,33 @@
   }
 }
 
+.ant-menu-item:hover {
+  background: $primary-light-color;
+}
+
+@media (min-width: 768px) {
+  .ant-menu-sub {
+    width: 720px;
+  }
+}
+@media (min-width: 992px) {
+  .ant-menu-sub {
+    width: 940px;
+    left: 381.5px;
+    top: 305px;
+  }
+}
+@media (min-width: 1200px) {
+  .ant-menu-sub {
+    width: 1140px;
+  }
+  // TODO: refactor this after have design
+  .ant-menu-submenu-popup {
+    left: 381.5px !important;
+    top: 305px !important;
+  }
+}
+
 .search-car-panel {
   margin-top: 20px;
   padding: $default-padding;

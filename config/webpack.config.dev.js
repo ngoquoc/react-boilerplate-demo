@@ -264,4 +264,7 @@ module.exports = {
   performance: {
     hints: false,
   },
+  externals: {
+    config: JSON.stringify(require('./config.dev.json')),
+  },
 };

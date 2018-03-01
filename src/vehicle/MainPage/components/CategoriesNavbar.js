@@ -1,5 +1,58 @@
 import React from 'react';
-import { Menu, Row, Col } from 'antd';
+import { Menu } from 'antd';
+import {
+  CarMenuData,
+  MotorbikesMenuData,
+  MotorhomesMenuData,
+  TrucksMenuData,
+} from 'shared/constants/api-data';
+
+const CarMenuItems = () => {
+  return CarMenuData.map((item, index) => {
+    return (
+      <Menu.Item className="ant-col-6" key={`1.${index}`}>
+        {item}
+      </Menu.Item>
+    );
+  });
+};
+const MotorbikesMenuItems = () => {
+  return MotorbikesMenuData.map((item, index) => {
+    return (
+      <Menu.Item className="ant-col-6" key={`2.${index}`}>
+        {item}
+      </Menu.Item>
+    );
+  });
+};
+const MotorhomesMenuItems = () => {
+  return MotorhomesMenuData.map((item, index) => {
+    return (
+      <Menu.Item className="ant-col-6" key={`3.${index}`}>
+        {item}
+      </Menu.Item>
+    );
+  });
+};
+const TrucksMenuItems = () => {
+  return TrucksMenuData.map((item, index) => {
+    return (
+      <Menu.Item className="ant-col-6" key={`4.${index}`}>
+        {item}
+      </Menu.Item>
+    );
+  });
+};
+const OthersMenuItems = () => {
+  return CarMenuData.map((item, index) => {
+    return (
+      <Menu.Item className="ant-col-6" key={`5.${index}`}>
+        {item}
+      </Menu.Item>
+    );
+  });
+};
+
 const CategoriesNavbar = () => {
   return (
     <div className="categories-navbar">
@@ -10,21 +63,47 @@ const CategoriesNavbar = () => {
         className="pull-right"
       >
         <Menu.SubMenu title="Car">
-          <Menu.ItemGroup title={<a href="#">View all cars</a>}>
-            <Menu.Item key="1.1">Small Car</Menu.Item>
-
-            <Menu.Item key="1.2">Small Car</Menu.Item>
-
-            <Menu.Item key="1.3">Small Car</Menu.Item>
+          <Menu.ItemGroup
+            className="ant-row"
+            title={<a href="#">View all cars</a>}
+          >
+            {CarMenuItems()}
           </Menu.ItemGroup>
         </Menu.SubMenu>
-        <Menu.Item key="2">Motorbikes</Menu.Item>
-        <Menu.Item key="3">Motorhomes</Menu.Item>
-        <Menu.Item key="4">Trucks</Menu.Item>
-        <Menu.Item key="5">Others</Menu.Item>
+        <Menu.SubMenu title="Motorbikes">
+          <Menu.ItemGroup
+            className="ant-row"
+            title={<a href="#">View all motorbikes</a>}
+          >
+            {MotorbikesMenuItems()}
+          </Menu.ItemGroup>
+        </Menu.SubMenu>
+        <Menu.SubMenu title="Motorhomes">
+          <Menu.ItemGroup
+            className="ant-row"
+            title={<a href="#">View all motorhomes & vans</a>}
+          >
+            {MotorhomesMenuItems()}
+          </Menu.ItemGroup>
+        </Menu.SubMenu>
+        <Menu.SubMenu title="Trucks">
+          <Menu.ItemGroup
+            className="ant-row"
+            title={<a href="#">View all Trucks</a>}
+          >
+            {TrucksMenuItems()}
+          </Menu.ItemGroup>
+        </Menu.SubMenu>
+        <Menu.SubMenu title="Others">
+          <Menu.ItemGroup
+            className="ant-row"
+            title={<a href="#">View all Others</a>}
+          >
+            {OthersMenuItems()}
+          </Menu.ItemGroup>
+        </Menu.SubMenu>
       </Menu>
     </div>
   );
 };
-
 export default CategoriesNavbar;
