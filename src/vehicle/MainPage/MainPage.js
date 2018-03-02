@@ -2,8 +2,8 @@ import React from 'react';
 import {
   Header,
   CategoriesNavbar,
-  SearchCar,
-  CarListContainer,
+  SearchVehicle,
+  VehicleListContainer,
 } from './components';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -18,18 +18,19 @@ const propTypes = {
 
 class MainPage extends React.Component {
   componentWillMount() {
-    this.props.fetchMostviewData();
+    this.props.fetchMostviewData(1);
+    this.props.fetchLatestData(1);
   }
 
   render() {
-    const { mostview } = this.props;
+    const { mostview, latest } = this.props;
     return (
       <div>
         <Header />
         <div className="container">
           <CategoriesNavbar />
-          <SearchCar />
-          <CarListContainer mostview={mostview} />
+          <SearchVehicle />
+          <VehicleListContainer mostview={mostview} latest={latest} />
         </div>
       </div>
     );
@@ -39,5 +40,5 @@ class MainPage extends React.Component {
 MainPage.propTypes = propTypes;
 
 export default connect(state => getVehicleMainpage(state), {
-  fetchMostviewData: mainPageActions.fetchMostviewData,
+  ...mainPageActions,
 })(MainPage);
