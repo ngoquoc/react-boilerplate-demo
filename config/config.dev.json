@@ -1,4 +1,4 @@
 {
-  "apiServer": "http://zod.2cs.local:8081",
+  "apiServer": "https://webcore.omega-software.hr/index",
   "restApi": "vehicle/api"
 }

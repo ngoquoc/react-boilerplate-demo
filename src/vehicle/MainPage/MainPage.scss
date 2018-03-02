@@ -22,8 +22,11 @@
   }
 }
 
-.ant-menu-item:hover {
-  background: $primary-light-color;
+.ant-menu-item {
+  margin-bottom: 4px;
+  &:hover {
+    background: $primary-light-color;
+  }
 }
 
 @media (min-width: 768px) {
