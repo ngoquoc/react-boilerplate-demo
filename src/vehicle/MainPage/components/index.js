@@ -1,5 +1,5 @@
 export { default as CategoriesNavbar } from './CategoriesNavbar';
-export { default as CarItemDetail } from './CarItemDetail';
+export { default as VehicleItemDetail } from './VehicleItemDetail';
 export { default as Header } from './Header';
-export { default as SearchCar } from './SearchCar';
-export { default as CarListContainer } from './CarListContainer';
+export { default as SearchVehicle } from './SearchVehicle';
+export { default as VehicleListContainer } from './VehicleListContainer';

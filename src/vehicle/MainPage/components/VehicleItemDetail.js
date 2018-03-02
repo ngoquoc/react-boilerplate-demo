@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Button } from 'antd';
-
+import { toMoneyFormat } from 'utils';
 const propTypes = { item: PropTypes.object };
-const CarItemDetail = ({ item }) => {
+const VehicleItemDetail = ({ item }) => {
   return (
     <Row gutter={12} className="car-item-detail">
       <Col span={6}>
@@ -12,11 +12,11 @@ const CarItemDetail = ({ item }) => {
       <Col span={8} className="car-info">
         <span className="h4 title">{item.Title}</span>
         <div className="info">Make: {item.Make}</div>
-        <div className="info">Make: {item.Model}</div>
+        <div className="info">Model: {item.Model}</div>
         <div className="info">{item.OtherDescription}</div>
       </Col>
       <Col span={4} className="price">
-        <span className="h4">{item.MainPrice} €</span>
+        <span className="h4">{toMoneyFormat(item.MainPrice)} €</span>
       </Col>
       <Col span={6} className="vendor-info">
         <span className="h4 vendor-name">{item.SeoName}</span>
@@ -30,6 +30,6 @@ const CarItemDetail = ({ item }) => {
   );
 };
 
-CarItemDetail.propTypes = propTypes;
+VehicleItemDetail.propTypes = propTypes;
 
-export default CarItemDetail;
+export default VehicleItemDetail;
