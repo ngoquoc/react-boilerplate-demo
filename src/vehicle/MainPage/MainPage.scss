@@ -77,6 +77,18 @@
     line-height: 28px;
   }
 
+  .inline-form-item {
+    .ant-form-item {
+      display: flex;
+      .ant-form-item-label {
+        width: 25%;
+      }
+      .ant-form-item-control-wrapper {
+        width: 75%;
+      }
+    }
+  }
+
   .advertise {
     padding-left: 24px;
     cursor: pointer;

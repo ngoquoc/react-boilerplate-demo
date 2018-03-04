@@ -2,8 +2,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Button } from 'antd';
 import { toMoneyFormat } from 'utils';
-const propTypes = { item: PropTypes.object };
-const VehicleItemDetail = ({ item }) => {
+const propTypes = { item: PropTypes.object, onFavoriteClick: PropTypes.func };
+
+const VehicleItemDetail = ({ item, onFavoriteClick }) => {
   return (
     <Row gutter={12} className="car-item-detail">
       <Col span={6}>
@@ -24,7 +25,13 @@ const VehicleItemDetail = ({ item }) => {
       </Col>
       <div className="action-box">
         <Button type="primary">Contact</Button>
-        <Button icon="star">Mark as favorite</Button>
+        <Button
+          icon="star"
+          type={item.IsFavorite ? 'primary' : undefined}
+          onClick={() => onFavoriteClick(item)}
+        >
+          {item.IsFavorite ? 'Favorited' : 'Mark as favorite'}
+        </Button>
       </div>
     </Row>
   );

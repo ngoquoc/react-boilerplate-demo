@@ -1,5 +1,28 @@
 import React from 'react';
-import { Form, Select } from 'antd';
+import { Form, Select, Input } from 'antd';
+
+const validateStatusCalculate = (
+  touched,
+  error,
+  warning,
+  loading,
+  showValidateSuccess,
+) => {
+  let validateStatus = undefined;
+  if (touched) {
+    if (error) {
+      validateStatus = 'error';
+    } else if (warning) {
+      validateStatus = 'warning';
+    } else if (loading) {
+      validateStatus = 'validating';
+    } else {
+      validateStatus = showValidateSuccess ? 'success' : undefined;
+    }
+  }
+  return validateStatus;
+};
+
 /**
  * To render options for a select control
  *
@@ -12,50 +35,75 @@ const renderOptions = (options, keyName?, valueName?) => {
   if (!options || options.length === 0) {
     return '';
   }
-  return options.map(item => (
-    <option
-      key={keyName ? item[keyName] : item.key}
-      value={keyName ? item[keyName] : item.key}
-    >
-      {valueName ? item[valueName] : item.value}
-    </option>
+  return options.map((item, index) => (
+    <Select.Option value={valueName ? item[valueName] : item.value} key={index}>
+      {keyName ? item[keyName] : item.name}
+    </Select.Option>
   ));
 };
 
 export const SelectFieldWrapper = ({
   input,
   label,
-  type,
   meta: { touched, error, warning },
   data,
-  placeholder,
   keyName,
   valueName,
   disabled = false,
   loading,
+  showValidateSuccess = false,
+  ...extra
 }) => {
-  let validateStatus = '';
-  if (touched) {
-    if (error) {
-      validateStatus = 'error';
-    } else if (warning) {
-      validateStatus = 'warning';
-    } else if (loading) {
-      validateStatus = 'validating';
-    } else {
-      validateStatus = 'success';
-    }
-  }
+  let validateStatus = validateStatusCalculate(
+    touched,
+    error,
+    warning,
+    loading,
+    showValidateSuccess,
+  );
+
   return (
     <Form.Item
       label={label}
       hasFeedback
-      validateStatus={validateStatus ? validateStatus : undefined}
+      validateStatus={validateStatus}
       help={touched && error ? error : undefined}
     >
-      <Select placeholder={placeholder}>
+      <Select
+        {...input}
+        value={input.value == '' ? undefined : input.value}
+        {...extra}
+      >
         {renderOptions(data, keyName, valueName)}
       </Select>
+    </Form.Item>
+  );
+};
+
+export const TextFieldWrapper = ({
+  input,
+  label,
+  meta: { touched, error, warning },
+  disabled = false,
+  loading,
+  showValidateSuccess = false,
+  ...extra
+}) => {
+  let validateStatus = validateStatusCalculate(
+    touched,
+    error,
+    warning,
+    loading,
+    showValidateSuccess,
+  );
+  return (
+    <Form.Item
+      label={label}
+      hasFeedback
+      validateStatus={validateStatus}
+      help={touched && error ? error : undefined}
+    >
+      <Input {...input} disabled={disabled} {...extra} />
     </Form.Item>
   );
 };

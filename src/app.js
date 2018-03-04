@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import { Header, Footer } from './shared/components';
 import { Route, Switch } from 'react-router-dom';
 import { MainPage } from './vehicle';
+import LocalStorage from './vehicle/localStorage/LocalStorage';
 import { Layout } from 'antd';
 class App extends Component {
   render() {
@@ -17,6 +18,7 @@ class App extends Component {
           </Switch>
         </Layout.Content>
         <Footer />
+        <LocalStorage />
       </Layout>
     );
   }

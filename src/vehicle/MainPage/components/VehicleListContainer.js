@@ -4,36 +4,35 @@ import { Tabs, Divider } from 'antd';
 import { Loader } from 'shared/components';
 import VehicleItemDetail from './VehicleItemDetail';
 
-const propsTypes = { mostview: PropTypes.object, latest: PropTypes.object };
+const propsTypes = {
+  mostView: PropTypes.array,
+  latest: PropTypes.array,
+  onFavoriteClick: PropTypes.func.isRequired,
+};
 class VehicleListContainer extends Component {
   renderVehicleList(data) {
     return data.map((item, index) => {
       return (
-        <div>
-          <VehicleItemDetail item={item} key={index} />
+        <div key={index}>
+          <VehicleItemDetail
+            item={item}
+            onFavoriteClick={this.props.onFavoriteClick}
+          />
           <Divider />
         </div>
       );
     });
   }
   render() {
-    const { mostview, latest } = this.props;
+    const { mostView, latest } = this.props;
     return (
       <div className="car-list-container">
         <Tabs type="card">
           <Tabs.TabPane tab="Most viewed" key="1">
-            {mostview && mostview.Data ? (
-              this.renderVehicleList(mostview.Data)
-            ) : (
-              <Loader />
-            )}
+            {mostView ? this.renderVehicleList(mostView) : <Loader />}
           </Tabs.TabPane>
           <Tabs.TabPane tab="Latest" key="2">
-            {latest && latest.Data ? (
-              this.renderVehicleList(latest.Data)
-            ) : (
-              <Loader />
-            )}
+            {latest ? this.renderVehicleList(latest) : <Loader />}
           </Tabs.TabPane>
         </Tabs>
       </div>

@@ -8,12 +8,19 @@ import {
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import * as mainPageActions from './actions';
-import { getVehicleMainpage } from 'selectors';
+import { toggleFavorite } from '../localStorage/actions';
+import {
+  getVehicleMostViewWithFavorite,
+  getVehicleLatestWithFavorite,
+} from 'selectors';
 import './MainPage.scss';
 
 const propTypes = {
-  mostview: PropTypes.object,
+  mostView: PropTypes.array,
+  latest: PropTypes.array,
   fetchMostviewData: PropTypes.func,
+  fetchLatestData: PropTypes.func,
+  toggleFavorite: PropTypes.func,
 };
 
 class MainPage extends React.Component {
@@ -22,15 +29,23 @@ class MainPage extends React.Component {
     this.props.fetchLatestData(1);
   }
 
+  onFavoriteClick = product => {
+    this.props.toggleFavorite(product.ID);
+  };
+
   render() {
-    const { mostview, latest } = this.props;
+    const { mostView, latest } = this.props;
     return (
       <div>
         <Header />
         <div className="container">
           <CategoriesNavbar />
           <SearchVehicle />
-          <VehicleListContainer mostview={mostview} latest={latest} />
+          <VehicleListContainer
+            mostView={mostView}
+            latest={latest}
+            onFavoriteClick={this.onFavoriteClick}
+          />
         </div>
       </div>
     );
@@ -39,6 +54,13 @@ class MainPage extends React.Component {
 
 MainPage.propTypes = propTypes;
 
-export default connect(state => getVehicleMainpage(state), {
-  ...mainPageActions,
-})(MainPage);
+export default connect(
+  state => ({
+    mostView: getVehicleMostViewWithFavorite(state),
+    latest: getVehicleLatestWithFavorite(state),
+  }),
+  {
+    ...mainPageActions,
+    toggleFavorite,
+  },
+)(MainPage);
