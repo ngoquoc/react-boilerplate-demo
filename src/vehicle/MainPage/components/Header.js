@@ -7,7 +7,9 @@ const Header = () => {
         style={{
           background: 'url(assets/index_oglasi_logo.svg) no-repeat top center',
         }}
-      />
+      >
+        {}
+      </h1>
     </div>
   );
 };

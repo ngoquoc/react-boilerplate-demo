@@ -1,6 +1,5 @@
-import { handleActions, combineActions } from 'redux-actions';
+import { handleActions } from 'redux-actions';
 import { combineReducers } from 'redux';
-import * as actions from '../actions';
 const FAVORITES_KEY = 'favorite_list';
 const storage = window.localStorage;
 const initialState = { favorites: [] };

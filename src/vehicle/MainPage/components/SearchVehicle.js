@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import { Form, Select, Row, Col, Input, Button } from 'antd';
+import { Form, Select, Row, Col, Button } from 'antd';
 import { MakeData } from '../../../shared/constants/api-data';
 import { Field, reduxForm } from 'redux-form';
 import { SelectFieldWrapper, TextFieldWrapper } from 'shared/components';
+
 class SearchVehicle extends Component {
   renderMakeDropdown = () => {
     return (
@@ -133,7 +134,10 @@ class SearchVehicle extends Component {
           </Form>
         </Col>
         <Col span={12} className="advertise">
-          <img src="https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/1939/2017/05/30154953/5726568942-933b34f713-b.jpeg" />
+          <img
+            src="https://s3-us-west-2.amazonaws.com/courses-images/wp-content/uploads/sites/1939/2017/05/30154953/5726568942-933b34f713-b.jpeg"
+            alt="advertise"
+          />
         </Col>
       </Row>
     );

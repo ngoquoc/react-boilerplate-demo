@@ -71,7 +71,7 @@ export const SelectFieldWrapper = ({
     >
       <Select
         {...input}
-        value={input.value == '' ? undefined : input.value}
+        value={input.value === '' ? undefined : input.value}
         {...extra}
       >
         {renderOptions(data, keyName, valueName)}

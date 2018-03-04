@@ -29,8 +29,12 @@ class MainPage extends React.Component {
     this.props.fetchLatestData(1);
   }
 
-  onFavoriteClick = product => {
+  handleFavoriteClick = product => {
     this.props.toggleFavorite(product.ID);
+  };
+
+  handleSearchSubmit = values => {
+    console.log(values);
   };
 
   render() {
@@ -40,11 +44,11 @@ class MainPage extends React.Component {
         <Header />
         <div className="container">
           <CategoriesNavbar />
-          <SearchVehicle />
+          <SearchVehicle onSubmit={this.handleSearchSubmit} />
           <VehicleListContainer
             mostView={mostView}
             latest={latest}
-            onFavoriteClick={this.onFavoriteClick}
+            onFavoriteClick={this.handleFavoriteClick}
           />
         </div>
       </div>
