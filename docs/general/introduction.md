@@ -27,6 +27,8 @@ Here's a curated list of packages that you should have knowledge of, before star
 ### Linting
 
 - [x] [ESLint](http://eslint.org/)
+      <template id="coding-convention-guidelines"></template>
+- [x] [**Coding convention guidelines**](https://github.com/airbnb/javascript)
 
 ### Internationalization
 

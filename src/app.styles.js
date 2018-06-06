@@ -3,20 +3,20 @@ export default {
     margin: '0',
     padding: '0',
     fontFamily: 'Roboto, sans-serif',
-    backgroundColor: '#fff !important'
+    backgroundColor: '#fff !important',
   },
 
   nav: {
     '& li:hover': {
-      backgroundColor: '#efefef'
-    }
+      backgroundColor: '#efefef',
+    },
   },
 
   content: {
-    minHeight: '800px'
+    minHeight: '800px',
   },
 
   layout: {
-    backgroundColor: 'transparent'
-  }
+    backgroundColor: 'transparent',
+  },
 };

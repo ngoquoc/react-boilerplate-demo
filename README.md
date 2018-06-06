@@ -5,6 +5,12 @@
 3.  Run `npm install` in order to install dependencies.
 4.  Run `npm start` to start the example app.
 
+## Build production bundle
+
+Run `npm run build`.
+Generated bundle will be in `build` folder.
+
 ## Documentation
 
 - [Introduction](https://github.com/bl5ck/react-boilerplate-demo/blob/master/docs/general/introduction.md): An introduction for newcomers to this boilerplate.
+- [Coding convention guidelines](https://github.com/airbnb/javascript).
