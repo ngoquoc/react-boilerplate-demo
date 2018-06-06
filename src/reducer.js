@@ -1,12 +1,12 @@
 import { combineReducers } from 'redux';
 import { reducer as form } from 'redux-form';
 import { routerReducer } from 'react-router-redux';
-import vehicleReducer from './vehicle/reducer';
+import vehicle from './containers/Vehicle/vehicle.ducks';
+import user from './containers/User/user.ducks';
 
-const rootReducer = combineReducers({
+export default combineReducers({
   form,
   router: routerReducer,
-  vehicle: vehicleReducer,
+  vehicle,
+  user
 });
-
-export default rootReducer;

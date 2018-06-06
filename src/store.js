@@ -9,9 +9,7 @@ export const history = createHistory({ basename: BASE_NAME });
 const middlewares = [routerMiddleware(history), promiseMiddleware];
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-let store = createStore(
+export default createStore(
   rootReducer,
-  composeEnhancers(applyMiddleware(...middlewares)),
+  composeEnhancers(applyMiddleware(...middlewares))
 );
-
-export default store;
