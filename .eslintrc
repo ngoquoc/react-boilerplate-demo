@@ -32,7 +32,9 @@
     "max-len": [0, 80],
     "radix": "off",
     "no-unused-vars": "error",
-    "linebreak-style": "off"
+    "linebreak-style": "off",
+    "react/jsx-filename-extension": "off",
+    "react/forbid-prop-types": "off"
   },
   "plugins": ["react", "flowtype"]
 }

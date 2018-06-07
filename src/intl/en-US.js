@@ -3,5 +3,5 @@ export default {
   MOTORCYCLES: 'Motorcycles',
   MOTORHOMES_CARAVANS: 'Motorhomes & Caravans',
   SEARCH: 'Search',
-  SELL: 'Sell'
+  SELL: 'Sell',
 };

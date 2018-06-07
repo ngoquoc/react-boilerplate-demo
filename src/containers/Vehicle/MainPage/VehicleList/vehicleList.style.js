@@ -5,14 +5,14 @@ export default theme => ({
       marginBottom: '0px',
       '& .ant-tabs-tab': {
         borderRadius: 'inherit !important',
-        marginRight: '-1px !important'
-      }
+        marginRight: '-1px !important',
+      },
     },
 
     '& .ant-tabs-tabpane': {
       padding: theme.defaultPadding,
       background: theme.white,
-      minHeight: '300px'
-    }
-  }
+      minHeight: '300px',
+    },
+  },
 });

@@ -3,7 +3,7 @@ import { List } from 'immutable';
 
 const initialState = {
   users: [],
-  me: null
+  me: null,
 };
 
 export const login = createAction('USER_LOGIN');
@@ -14,7 +14,7 @@ export default handleActions(
     [login](
       state,
       {
-        payload: { id, users }
+        payload: { id, users },
       }
     ) {
       if (!id || !users || users.indexOf(id) === -1) {
@@ -23,7 +23,7 @@ export default handleActions(
       return {
         ...state,
         me: id,
-        users
+        users,
       };
     },
     [logout](state) {
@@ -31,9 +31,9 @@ export default handleActions(
       return {
         ...state,
         me: null,
-        users
+        users,
       };
-    }
+    },
   },
   initialState
 );

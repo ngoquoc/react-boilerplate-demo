@@ -6,7 +6,7 @@ export default {
       position: 'absolute',
       display: 'block',
       top: '50%',
-      marginTop: '-20px'
-    }
-  }
+      marginTop: '-20px',
+    },
+  },
 };

@@ -4,8 +4,8 @@ export default {
     marginBottom: '20px',
 
     '& img': {
-      maxWidth: '100%'
-    }
+      maxWidth: '100%',
+    },
   },
   actionBox: {
     position: 'absolute',
@@ -13,12 +13,12 @@ export default {
     bottom: '0px',
 
     '& button': {
-      marginLeft: '5px'
-    }
+      marginLeft: '5px',
+    },
   },
   price: {
     paddingRight: '30px !important',
     textAlign: 'right',
-    fontWeight: 900
-  }
+    fontWeight: 900,
+  },
 };

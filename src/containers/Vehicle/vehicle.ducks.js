@@ -1,14 +1,15 @@
 import { createAction, handleActions } from 'redux-actions';
 import { apiGet } from '../../utils';
+
 export const fetchMostviewData = createAction(
   'FETCH_MOSTVIEW_DATA',
   async (vehicles, page: number) => {
-    let result = await apiGet('vehicle-ads/mostView/?page=' + page);
+    const result = await apiGet(`vehicle-ads/mostView/?page=${page}`);
     let ids = [];
     const items = [];
     if (result && result.data) {
       const vehicleIds = vehicles.map(({ id }) => id);
-      ids = result.data.map(item => {
+      ids = result.data.map((item) => {
         if (vehicleIds.indexOf(item.id) === -1) {
           items.push(item);
         }
@@ -22,12 +23,12 @@ export const fetchMostviewData = createAction(
 export const fetchLatestData = createAction(
   'FETCH_LATEST_DATA',
   async (vehicles, page: number) => {
-    let result = await apiGet('vehicle-ads/latest/?page=' + page);
+    const result = await apiGet(`vehicle-ads/latest/?page=${page}`);
     let ids = [];
     const items = [];
     if (result && result.data) {
       const vehicleIds = vehicles.map(({ id }) => id);
-      ids = result.data.map(item => {
+      ids = result.data.map((item) => {
         if (vehicleIds.indexOf(item.id) === -1) {
           items.push(item);
         }
@@ -41,7 +42,7 @@ export const fetchLatestData = createAction(
 const initialState = {
   vehicles: [],
   mostView: [],
-  latest: []
+  latest: [],
 };
 
 export default handleActions(
@@ -49,7 +50,7 @@ export default handleActions(
     [fetchMostviewData](
       state,
       {
-        payload: { ids, items }
+        payload: { ids, items },
       }
     ) {
       if (!ids || !items) {
@@ -58,13 +59,13 @@ export default handleActions(
       return {
         ...state,
         mostView: ids,
-        vehicles: [...state.vehicles, ...items]
+        vehicles: [...state.vehicles, ...items],
       };
     },
     [fetchLatestData](
       state,
       {
-        payload: { ids, items }
+        payload: { ids, items },
       }
     ) {
       if (!ids || !items) {
@@ -73,9 +74,9 @@ export default handleActions(
       return {
         ...state,
         latest: ids,
-        vehicles: [...state.vehicles, ...items]
+        vehicles: [...state.vehicles, ...items],
       };
-    }
+    },
   },
   initialState
 );

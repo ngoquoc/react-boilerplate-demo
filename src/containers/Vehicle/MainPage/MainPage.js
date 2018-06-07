@@ -10,7 +10,7 @@ import { fetchMostviewData, fetchLatestData } from '../vehicle.ducks';
 import {
   getVehicles,
   getVehicleMostViewWithFavorite,
-  getVehicleLatestWithFavorite
+  getVehicleLatestWithFavorite,
 } from '../selectors';
 import styles from './mainPage.styles';
 
@@ -20,7 +20,16 @@ class MainPage extends React.Component {
     latest: PropTypes.array,
     fetchMostviewData: PropTypes.func,
     fetchLatestData: PropTypes.func,
-    toggleFavorite: PropTypes.func
+    vehicles: PropTypes.array,
+    classes: PropTypes.object.isRequired,
+  };
+
+  static defaultProps = {
+    mostView: [],
+    latest: [],
+    vehicles: [],
+    fetchMostviewData: null,
+    fetchLatestData: null,
   };
 
   componentWillMount() {
@@ -29,9 +38,9 @@ class MainPage extends React.Component {
     this.props.fetchLatestData(vehicles, 1);
   }
 
-  handleFavoriteClick = product => {};
+  handleFavoriteClick = () => {};
 
-  handleSearchSubmit = values => {
+  handleSearchSubmit = (values) => {
     console.log(values);
   };
 
@@ -58,10 +67,10 @@ export default connect(
   state => ({
     mostView: getVehicleMostViewWithFavorite(state),
     latest: getVehicleLatestWithFavorite(state),
-    vehicles: getVehicles(state)
+    vehicles: getVehicles(state),
   }),
   {
     fetchMostviewData,
-    fetchLatestData
+    fetchLatestData,
   }
 )(injectSheet(styles)(MainPage));

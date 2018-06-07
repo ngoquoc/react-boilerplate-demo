@@ -6,6 +6,8 @@ import { toMoneyFormat } from '../../../../utils';
 import styles from './vehicleItemDetail.styles';
 
 const propTypes = {
+  classes: PropTypes.object.isRequired,
+  onFavoriteClick: PropTypes.func.isRequired,
   item: PropTypes.shape({
     ImageLink: PropTypes.string,
     Title: PropTypes.string.isRequired,
@@ -15,9 +17,8 @@ const propTypes = {
     MainPrice: PropTypes.number.isRequired,
     SeoName: PropTypes.string,
     Address: PropTypes.string,
-    IsFavorite: PropTypes.boolean
+    IsFavorite: PropTypes.boolean,
   }),
-  onFavoriteClick: PropTypes.func.isRequired
 };
 
 const VehicleItemDetail = ({ item, onFavoriteClick, classes }) => (
@@ -55,5 +56,8 @@ const VehicleItemDetail = ({ item, onFavoriteClick, classes }) => (
 );
 
 VehicleItemDetail.propTypes = propTypes;
+VehicleItemDetail.defaultProps = {
+  item: null,
+};
 
 export default injectSheet(styles)(VehicleItemDetail);

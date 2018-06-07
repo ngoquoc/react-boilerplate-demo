@@ -8,7 +8,7 @@ export const THEME_CONFIG = {
   primaryLightColor: '#e5f7ff',
   black: '#001529',
   white: '#fff',
-  defaultPadding: 24
+  defaultPadding: 24,
 };
 export const INTL_LOCALE =
   window.indexad.INTL_LOCALE ||

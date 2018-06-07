@@ -2,25 +2,31 @@ import React from 'react';
 import { Layout, Menu } from 'antd';
 import injectSheet from 'react-jss';
 import { Route, Switch } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import { Header, Footer, Translation } from './components';
 import UnauthenticatedLoginMenuItem from './containers/User/LoginMenuItem';
 import enableTranslation from './HOCs/intl/enableTranslation';
 import Vehicle from './containers/Vehicle';
 import styles from './app.styles';
+
 class App extends React.Component {
+  static propTypes = {
+    translate: PropTypes.func.isRequired,
+    classes: PropTypes.object.isRequired,
+  };
   state = {
     searchTitle: 'SEARCH',
-    sellTitle: 'SELL'
+    sellTitle: 'SELL',
   };
   componentWillMount() {
     const { translate } = this.props;
     Promise.all([
       translate(this.state.searchTitle),
-      translate(this.state.sellTitle)
+      translate(this.state.sellTitle),
     ]).then(([searchTitle, sellTitle]) => {
       this.setState({
         searchTitle,
-        sellTitle
+        sellTitle,
       });
     });
   }

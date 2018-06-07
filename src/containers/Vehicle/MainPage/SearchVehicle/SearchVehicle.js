@@ -1,24 +1,25 @@
 import React, { Component } from 'react';
 import { Form, Select, Row, Col, Button, Input } from 'antd';
+import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import injectSheet from 'react-jss';
 import { MOCK_VEHICLE_DATA } from '../../../../mockData';
 import styles from './searchVehicle.styles';
 
 class SearchVehicle extends Component {
-  renderMakeDropdown = () => {
-    return (
-      <Select placeholder="Select one">
-        {MOCK_VEHICLE_DATA.map((item, index) => {
-          return (
-            <Select.Option key={index} value={item.value}>
-              {item.name}
-            </Select.Option>
-          );
-        })}
-      </Select>
-    );
+  static propTypes = {
+    handleSubmit: PropTypes.func.isRequired,
+    classes: PropTypes.object.isRequired,
   };
+  renderMakeDropdown = () => (
+    <Select placeholder="Select one">
+      {MOCK_VEHICLE_DATA.map(item => (
+        <Select.Option key={item.id} value={item.value}>
+          {item.name}
+        </Select.Option>
+      ))}
+    </Select>
+  );
 
   render() {
     const { handleSubmit, classes } = this.props;
@@ -154,5 +155,5 @@ class SearchVehicle extends Component {
 }
 
 export default reduxForm({
-  form: 'searchMainPage'
+  form: 'searchMainPage',
 })(injectSheet(styles)(SearchVehicle));

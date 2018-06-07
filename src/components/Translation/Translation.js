@@ -8,11 +8,11 @@ export default class Translation extends React.Component {
   static propTypes = {
     children: PropTypes.string.isRequired,
     id: PropTypes.string,
-    values: PropTypes.object
+    values: PropTypes.object,
   };
   static defaultProps = {
     id: '',
-    values: {}
+    values: {},
   };
   constructor(props) {
     super(props);
@@ -20,8 +20,7 @@ export default class Translation extends React.Component {
   }
   componentWillMount() {
     this.updateMessage(this.props.children).then(message =>
-      this.setState({ message })
-    );
+      this.setState({ message }));
   }
   componentWillReceiveProps({ id: nextId, children: nextChildren }) {
     let id;
@@ -32,32 +31,31 @@ export default class Translation extends React.Component {
       this.updateMessage(nextChildren).then(message =>
         this.setState({
           id,
-          message
-        })
-      );
+          message,
+        }));
     } else if (id) {
       this.setState({
-        id
+        id,
       });
     }
   }
-  updateMessage = async message => {
+  updateMessage = async (message) => {
     if (!message) {
       return '';
     }
     const locale = INTL_LOCALE;
     if (
-      !window._intl ||
-      !window._intl[INTL_LOCALE] ||
-      !window._intl[INTL_LOCALE][message]
+      !window.intlCache ||
+      !window.intlCache[INTL_LOCALE] ||
+      !window.intlCache[INTL_LOCALE][message]
     ) {
-      window._intl = window._intl || {
-        [INTL_LOCALE]: {}
+      window.intlCache = window.intlCache || {
+        [INTL_LOCALE]: {},
       };
       const { default: localeData } = await import(`../../intl/${locale}.js`);
-      window._intl[INTL_LOCALE] = localeData;
+      window.intlCache[INTL_LOCALE] = localeData;
     }
-    return window._intl[INTL_LOCALE][message] || message;
+    return window.intlCache[INTL_LOCALE][message] || message;
   };
   render() {
     const { children, id, ...props } = this.props;

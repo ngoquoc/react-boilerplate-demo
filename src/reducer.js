@@ -8,5 +8,5 @@ export default combineReducers({
   form,
   router: routerReducer,
   vehicle,
-  user
+  user,
 });

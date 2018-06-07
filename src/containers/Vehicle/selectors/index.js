@@ -6,15 +6,11 @@ export const getVehicles = state => state.vehicle.vehicles;
 //   store.getState().vehicle.localStorage.favorites;
 
 const getVehicleMostViewData = state =>
-  getVehicles(state).filter(
-    ({ id }) => state.vehicle.mostView.indexOf(id) !== -1
-  );
+  getVehicles(state).filter(({ id }) => state.vehicle.mostView.indexOf(id) !== -1);
 const getVehicleLatestData = state =>
-  getVehicles(state).filter(
-    ({ id }) => state.vehicle.latest.indexOf(id) !== -1
-  );
-export const getVehicleMostViewWithFavorite = state => {
-  let mostViewData = getVehicleMostViewData(state);
+  getVehicles(state).filter(({ id }) => state.vehicle.latest.indexOf(id) !== -1);
+export const getVehicleMostViewWithFavorite = (state) => {
+  const mostViewData = getVehicleMostViewData(state);
   // mostViewData.forEach(
   //   product =>
   //     (product.IsFavorite = getProductFavorite(
@@ -22,10 +18,10 @@ export const getVehicleMostViewWithFavorite = state => {
   //       product.ID,
   //     )),
   // );
-  return mostViewData ? mostViewData : undefined;
+  return mostViewData || undefined;
 };
-export const getVehicleLatestWithFavorite = state => {
-  let latestData = getVehicleLatestData(state);
+export const getVehicleLatestWithFavorite = (state) => {
+  const latestData = getVehicleLatestData(state);
   // latestData.forEach(
   //   product =>
   //     (product.IsFavorite = getProductFavorite(
@@ -33,5 +29,5 @@ export const getVehicleLatestWithFavorite = state => {
   //       product.ID
   //     ))
   // );
-  return latestData ? latestData : undefined;
+  return latestData || undefined;
 };
