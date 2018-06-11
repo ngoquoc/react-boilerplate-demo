@@ -1,4 +1,4 @@
-import { gUuidV4 } from '../utils';
+import { gUuidV4 } from '../utils/string';
 
 export const MOCK_VEHICLE_DATA = [
   { id: gUuidV4(), value: 'AC', name: 'AC' },
