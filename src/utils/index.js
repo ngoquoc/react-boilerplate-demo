@@ -1,2 +1,2 @@
 export * from './apiUtils';
-export * from './string';
+export * from './stringUtils';
