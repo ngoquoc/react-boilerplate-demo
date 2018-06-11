@@ -118,7 +118,7 @@ In our application we are using two such middleware.
 Reselect is a library used for slicing your redux state and providing only the relevant sub-tree to a react component. It has three key features:
 
 1.  Computational power
-2.  Memorization
+2.  Memoization
 3.  Composability
 
 Imagine an application that shows a list of users. Its redux state tree stores an array of usernames with signatures:
@@ -128,5 +128,5 @@ Imagine an application that shows a list of users. Its redux state tree stores a
 Let's see how the three features of reselect help.
 
 - **Computation:** While performing a search operation, reselect will filter the original array and return only matching usernames. Redux state does not have to store a separate array of filtered usernames.
-- **Memorization:** A selector will not compute a new result unless one of its arguments change. That means, if you are repeating the same search once again, reselect will not filter the array over and over. It will just return the previously computed, and subsequently cached, result. Reselect compares the old and the new arguments and then decides whether to compute again or return the cached result.
+- **Memoization:** A selector will not compute a new result unless one of its arguments change. That means, if you are repeating the same search once again, reselect will not filter the array over and over. It will just return the previously computed, and subsequently cached, result. Reselect compares the old and the new arguments and then decides whether to compute again or return the cached result.
 - **Composability:** You can combine multiple selectors. For example, one selector can filter usernames according to a search key and another selector can filter the already filtered array according to gender. One more selector can further filter according to age. You combine these selectors by using `createSelector()`

@@ -14,3 +14,4 @@ Generated bundle will be in `build` folder.
 
 - [Introduction](https://github.com/bl5ck/react-boilerplate-demo/blob/master/docs/general/introduction.md): An introduction for newcomers to this boilerplate.
 - [Coding convention guidelines](https://github.com/airbnb/javascript).
+- [Workspace setup](https://github.com/bl5ck/react-boilerplate-demo/blob/master/docs/general/workspace-setup.md)
