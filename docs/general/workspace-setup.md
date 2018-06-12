@@ -136,7 +136,7 @@ Once you have done that, this document is intended to give you a ideal workspace
 
   "html.format.wrapAttributes": "force-aligned",
 
-  "javascript.validate.enable": false,
+  "javascript.validate.enable": true,
   "javascript.referencesCodeLens.enabled": true,
 
   "prettier.eslintIntegration": true,
