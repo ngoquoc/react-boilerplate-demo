@@ -1,33 +1,38 @@
-// import store from '../../../store';
-// import { getProductFavorite } from '../vehicle/localStorage/reducer/localStorageReducer';
+import { createSelector } from 'reselect';
+
 export const getVehicles = state => state.vehicle.vehicles;
-
-// export const getVehicleLocalFavorites = () =>
-//   store.getState().vehicle.localStorage.favorites;
-
-const getVehicleMostViewData = state =>
-  getVehicles(state).filter(({ id }) => state.vehicle.mostView.indexOf(id) !== -1);
-const getVehicleLatestData = state =>
-  getVehicles(state).filter(({ id }) => state.vehicle.latest.indexOf(id) !== -1);
-export const getVehicleMostViewWithFavorite = (state) => {
-  const mostViewData = getVehicleMostViewData(state);
-  // mostViewData.forEach(
-  //   product =>
-  //     (product.IsFavorite = getProductFavorite(
-  //       state.vehicle.localStorage,
-  //       product.ID,
-  //     )),
-  // );
-  return mostViewData || undefined;
-};
-export const getVehicleLatestWithFavorite = (state) => {
-  const latestData = getVehicleLatestData(state);
-  // latestData.forEach(
-  //   product =>
-  //     (product.IsFavorite = getProductFavorite(
-  //       state.vehicle.localStorage,
-  //       product.ID
-  //     ))
-  // );
-  return latestData || undefined;
-};
+export const getVehicleMostView = state => state.vehicle.mostView;
+export const getVehicleLatest = state => state.vehicle.latest;
+export const getVehicleMostViewData = createSelector(
+  [getVehicles, getVehicleMostView],
+  (vehicles, mostView) =>
+    vehicles.filter(({ id }) => mostView.indexOf(id) !== -1)
+);
+export const getVehicleLatestData = createSelector(
+  [getVehicles, getVehicleLatest],
+  (vehicles, latest) => vehicles.filter(({ id }) => latest.indexOf(id) !== -1)
+);
+export const getVehicleMostViewWithFavorite = createSelector(
+  getVehicleMostViewData,
+  mostViewData =>
+    // mostViewData.forEach(
+    //   product =>
+    //     (product.IsFavorite = getProductFavorite(
+    //       state.vehicle.localStorage,
+    //       product.ID,
+    //     )),
+    // );
+    mostViewData || undefined
+);
+export const getVehicleLatestWithFavorite = createSelector(
+  getVehicleLatestData,
+  latestData =>
+    // latestData.forEach(
+    //   product =>
+    //     (product.IsFavorite = getProductFavorite(
+    //       state.vehicle.localStorage,
+    //       product.ID
+    //     ))
+    // );
+    latestData || undefined
+);
