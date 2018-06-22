@@ -37,7 +37,6 @@ class MainPage extends React.Component {
     this.props.fetchMostviewData(vehicles, 1);
     this.props.fetchLatestData(vehicles, 1);
   }
-
   handleFavoriteClick = () => {};
 
   handleSearchSubmit = (values) => {
