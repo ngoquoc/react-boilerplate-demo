@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import injectSheet from 'react-jss';
+import config from 'config.json';
 import CategoriesNavbar from './CategoriesNavbar';
 import Header from './Header';
 import SearchVehicle from './SearchVehicle';
@@ -13,6 +14,8 @@ import {
   getVehicleLatestWithFavorite,
 } from '../selectors';
 import styles from './mainPage.styles';
+
+console.log(config);
 
 class MainPage extends React.Component {
   static propTypes = {

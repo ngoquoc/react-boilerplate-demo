@@ -137,10 +137,14 @@ export const apiPost = (path, body, options = {}) =>
  */
 export const apiGet = (path, options = {}) => {
   const cacheable = isCacheable(path);
-  const fetchAPI = fetchWithTimeout(
-    [buildURL(path), Object.assign(options, defaultOptions, { method: 'GET' })],
-    options.timeout
-  ).then(handleErrors);
+  const fetchAPI = () =>
+    fetchWithTimeout(
+      [
+        buildURL(path),
+        Object.assign(options, defaultOptions, { method: 'GET' }),
+      ],
+      options.timeout
+    ).then(handleErrors);
   return !options.forceUpdate && cacheable
     ? getCachedResult(path, fetchAPI)
     : fetchAPI();
