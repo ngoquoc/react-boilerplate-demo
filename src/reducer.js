@@ -1,6 +1,7 @@
 import { combineReducers } from 'redux';
 import { reducer as form } from 'redux-form';
 import { routerReducer } from 'react-router-redux';
+import { intlReducer as intl } from 'react-intl-redux';
 import vehicle from './containers/Vehicle/vehicle.ducks';
 import user from './containers/User/user.ducks';
 
@@ -9,4 +10,5 @@ export default combineReducers({
   router: routerReducer,
   vehicle,
   user,
+  intl,
 });

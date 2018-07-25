@@ -27,7 +27,7 @@ const Header = ({ classes, children }) => (
 
 Header.propTypes = {
   classes: PropTypes.object.isRequired,
-  children: PropTypes.element,
+  children: PropTypes.array,
 };
 Header.defaultProps = {
   children: null,

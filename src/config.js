@@ -14,4 +14,4 @@ export const INTL_LOCALE =
   window.indexad.INTL_LOCALE ||
   navigator.language ||
   navigator.browserLanguage ||
-  'en';
+  'en-US';

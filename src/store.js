@@ -3,6 +3,7 @@ import { routerMiddleware } from 'react-router-redux';
 import promiseMiddleware from 'redux-promise';
 import createHistory from 'history/createBrowserHistory';
 import rootReducer from './reducer';
+import { INTL_LOCALE } from './config';
 
 const BASE_NAME = window.indexad.PUBLIC_URL;
 
@@ -13,5 +14,11 @@ const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
 export default createStore(
   rootReducer,
+  {
+    intl: {
+      locale: INTL_LOCALE,
+      messages: {},
+    },
+  },
   composeEnhancers(applyMiddleware(...middlewares))
 );
