@@ -15,3 +15,4 @@ Generated bundle will be in `build` folder.
 - [Introduction](https://github.com/ngoquoc/react-boilerplate-demo/blob/master/docs/general/introduction.md): An introduction for newcomers to this boilerplate.
 - [Coding convention guidelines](https://github.com/airbnb/javascript).
 - [Workspace setup](https://github.com/ngoquoc/react-boilerplate-demo/blob/master/docs/general/workspace-setup.md).
+- [Example ejecting guide](https://github.com/ngoquoc/react-boilerplate-demo/blob/master/docs/general/ejecting-guide.md).
