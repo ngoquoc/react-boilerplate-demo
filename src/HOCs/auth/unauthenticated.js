@@ -7,7 +7,10 @@ export default function (Comp) {
   class UnauthenticatedComponent extends React.Component {
     static propTypes = {
       users: PropTypes.arrayOf(PropTypes.object).isRequired,
-      me: PropTypes.string.isRequired,
+      me: PropTypes.string,
+    };
+    static defaultProps = {
+      me: null,
     };
     state = { authenticated: false };
     componentWillMount() {
