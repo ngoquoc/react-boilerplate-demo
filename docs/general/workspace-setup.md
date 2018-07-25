@@ -1,6 +1,6 @@
 # Workspace setup
 
-The [`README.md`](https://github.com/bl5ck/react-boilerplate-demo) gives you adequate information on how to clone boilerplate files, install dependencies and launch the example app.
+The [`README.md`](https://github.com/ngoquoc/react-boilerplate-demo) gives you adequate information on how to clone boilerplate files, install dependencies and launch the example app.
 
 Once you have done that, this document is intended to give you a ideal workspace setup for React using [`Virtual Studio Code`](https://code.visualstudio.com/). Needs may vary so you can tailor your plugins collection and workspace settings to fit you best.
 

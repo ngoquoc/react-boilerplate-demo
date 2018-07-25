@@ -1,12 +1,12 @@
 # Introduction
 
-The [`README.md`](https://github.com/bl5ck/react-boilerplate-demo) gives you adequate information on how to clone boilerplate files, install dependencies and launch the example app.
+The [`README.md`](https://github.com/ngoquoc/react-boilerplate-demo) gives you adequate information on how to clone boilerplate files, install dependencies and launch the example app.
 
 Once you have done that, this document is intended to give you a taste of how `react-boilerplate-demo` works. It still assumes basic knowledge of React, Redux and `react-router`.
 
 ## Tech Stack
 
-Here's a curated list of packages that you should have knowledge of, before starting your awesome project. However, the best way to have a complete list of dependencies is to see [package.json](https://github.com/bl5ck/react-boilerplate-demo/blob/master/package.json).
+Here's a curated list of packages that you should have knowledge of, before starting your awesome project. However, the best way to have a complete list of dependencies is to see [package.json](https://github.com/ngoquoc/react-boilerplate-demo/blob/master/package.json).
 
 ### Core
 
@@ -66,7 +66,7 @@ You can launch the example app by running `npm start`. To fully understand its i
 
 ### How does the application boot up?
 
-Like any other webpage your app starts with the [`public/index.html`](https://github.com/bl5ck/react-boilerplate-demo/blob/master/public/index.html) file. React will render your application into the `div#root` .
+Like any other webpage your app starts with the [`public/index.html`](https://github.com/ngoquoc/react-boilerplate-demo/blob/master/public/index.html) file. React will render your application into the `div#root` .
 
 But how do we include all of your react components into a single html file? That's where webpack comes into the picture. Webpack will literally pack your application into small javascript files. These files will be injected into the `index.html` as `<script>` tags.
 
@@ -86,7 +86,7 @@ Webpack requires an entry point to your application. Think of it as a door to yo
 - A Router is connected to Redux.
 - i18n internationalization support was setup.
 - JSS support was setup.
-- `ReactDOM.render()` not only renders the [root react component](https://github.com/bl5ck/react-boilerplate-demo/blob/master/src/index.js) called `<App />`, of your application, but it renders it with `<Provider />`, `<IntlProvider />`, `<ThemeProvider />` and `<Router />`.
+- `ReactDOM.render()` not only renders the [root react component](https://github.com/ngoquoc/react-boilerplate-demo/blob/master/src/index.js) called `<App />`, of your application, but it renders it with `<Provider />`, `<IntlProvider />`, `<ThemeProvider />` and `<Router />`.
 
 * `<Provider />` connects your app with the redux `store`.
 * `<IntlProvider />` provides language translation support to your app.
@@ -100,7 +100,7 @@ Redux is going to play a huge role in your application. If you're new to Redux, 
 - [x] Understand the three principles of Redux
 - [x] Implement Redux in a small React app of yours
 
-The Redux `store` is the heart of your application. Check out [`store.js`](https://github.com/bl5ck/react-boilerplate-demo/blob/master/src/store.js) to see how we have configured the store.
+The Redux `store` is the heart of your application. Check out [`store.js`](https://github.com/ngoquoc/react-boilerplate-demo/blob/master/src/store.js) to see how we have configured the store.
 
 The store is created with the `createStore()` factory, which accepts three parameters.
 
@@ -130,3 +130,7 @@ Let's see how the three features of reselect help.
 - **Computation:** While performing a search operation, reselect will filter the original array and return only matching usernames. Redux state does not have to store a separate array of filtered usernames.
 - **Memoization:** A selector will not compute a new result unless one of its arguments change. That means, if you are repeating the same search once again, reselect will not filter the array over and over. It will just return the previously computed, and subsequently cached, result. Reselect compares the old and the new arguments and then decides whether to compute again or return the cached result.
 - **Composability:** You can combine multiple selectors. For example, one selector can filter usernames according to a search key and another selector can filter the already filtered array according to gender. One more selector can further filter according to age. You combine these selectors by using `createSelector()`
+
+### Eject example code
+
+Check [example ejecting guide](https://github.com/ngoquoc/react-boilerplate-demo/blob/master/docs/general/ejecting-guide.md)
