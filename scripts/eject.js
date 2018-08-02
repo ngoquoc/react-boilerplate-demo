@@ -194,6 +194,7 @@ const ejectSteps = [
         packageJsonPath,
         JSON.stringify(outputPackages, null, 2)
       );
+      fs.unlinkSync(backupPath);
     },
     undo: async (args, step) => {
       const backupPath = path.join(__dirname, '..', 'package.bk.json');
@@ -418,4 +419,23 @@ const execStep = async (step, index, steps) => {
   }
 };
 // exec all eject steps
-ejectSteps.forEach(execStep);
+const stdin = process.openStdin();
+log('<white You are going to eject example app from this boilerplate. /><yellow Please note that this action CANNOT be UNDONE!/>\nAre you sure to continue?(Y/N) Default is "N"').write();
+stdin.addListener('data', (answer) => {
+  switch (
+    answer
+      .toString()
+      .trim()
+      .toLowerCase()
+  ) {
+    case 'y': {
+      // exec all eject steps
+      Promise.all(ejectSteps.map((...args) => execStep(...args))).then(process.exit(0));
+      break;
+    }
+    case 'n':
+    default: {
+      process.exit(0);
+    }
+  }
+});
