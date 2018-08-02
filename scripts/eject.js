@@ -420,7 +420,11 @@ const execStep = async (step, index, steps) => {
 };
 // exec all eject steps
 const stdin = process.openStdin();
-log('<white You are going to eject example app from this boilerplate. /><yellow Please note that this action CANNOT be UNDONE!/>\nAre you sure to continue?(Y/N) Default is "N"').write();
+log(`
+  <white You are going to eject example app from this boilerplate. />
+  <yellow Please note that this action CANNOT be UNDONE!/>
+  <white Are you sure to continue?(Y/N) Default is "N" />
+  `).write();
 stdin.addListener('data', (answer) => {
   switch (
     answer
@@ -430,7 +434,9 @@ stdin.addListener('data', (answer) => {
   ) {
     case 'y': {
       // exec all eject steps
-      Promise.all(ejectSteps.map((...args) => execStep(...args))).then(process.exit(0));
+      Promise.all(ejectSteps.map((...args) => execStep(...args)))
+        .then(process.exit(0))
+        .catch(process.exit(1));
       break;
     }
     case 'n':
