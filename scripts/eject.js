@@ -1,4 +1,6 @@
 const { log } = require('jsuti');
+const path = require('path');
+const fs = require('fs');
 // configs
 /**
  * final args object
@@ -184,8 +186,25 @@ const ejectSteps = [
         homepage: args.home,
         private: args.private,
       };
+      // backup current package.json file
+      const backupPath = path.join(__dirname, '..', 'package.bk.json');
+      const packageJsonPath = path.join(__dirname, '..', 'package.json');
+      fs.copyFileSync(packageJsonPath, backupPath);
+      fs.writeFileSync(
+        packageJsonPath,
+        JSON.stringify(outputPackages, null, 2)
+      );
     },
-    undo: async (args, step) => {},
+    undo: async (args, step) => {
+      const backupPath = path.join(__dirname, '..', 'package.bk.json');
+      const packageJsonPath = path.join(__dirname, '..', 'package.json');
+      const stat = fs.statSync(packageJsonPath);
+      if (stat.isFile) {
+        fs.unlinkSync(packageJsonPath);
+      }
+      fs.copyFileSync(backupPath, packageJsonPath);
+      fs.unlinkSync(backupPath);
+    },
   },
   // eject configs
   {
@@ -305,73 +324,98 @@ const execStep = async (step, index, steps) => {
   if (isExecuted) {
     return step.executed;
   }
-  !step && log(name).write();
-  step.isExecuted = true;
-  const exectable = Boolean(exec);
-  log(`<green [Step ${name}]/> <yellow Step /><cyan ${name}/><yellow  started />`).write();
-  const isAsync = exec && exec.constructor.name === 'AsyncFunction';
-  if (exec && exec.constructor.name === 'AsyncFunction') {
-    let checkingIndex = index;
-    let previousStep = steps[checkingIndex - 1];
-    // find closest previous sync step
-    while (
-      previousStep &&
-      !previousStep.isExecuted &&
-      ((previousStep.parent && parent) || (!previousStep.parent && !parent)) &&
-      (!previousStep.exec ||
-        !previousStep.childProcesses ||
-        !previousStep.childProcesses.length ||
-        previousStep.exec.constructor.name === 'AsyncFunction')
-    ) {
-      checkingIndex--;
-      previousStep = steps[checkingIndex];
+  const catchHandle = async (error) => {
+    log(`<red [Step ${name}] Failed to execute because of following error:/>\n<white ${
+      error.stack
+    }/>`);
+    if (!undo) {
+      return undefined;
     }
-    // wait until closest previous sync step done
-    if (steps[checkingIndex + 1] && steps[checkingIndex + 1].executed) {
-      log(`<green [Step ${name}]/> <yellow Waiting for /><cyan ${
-        steps[checkingIndex + 1].name
-      }/><yellow until it is done... />`).write();
-      await steps[checkingIndex + 1].executed;
-      log(`<green [Step ${name}]/> <grey Step /><cyan ${
-        steps[checkingIndex + 1].name
-      }/><grey  was done. />`).write();
+    log(`<green [Step ${name}]/> <yellow Undoing step /><cyan ${name}/><yellow .../>`);
+    if (undo.constructor.name !== 'AsyncFunction') {
+      undo(args, step);
+      log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  was undone. />`).write();
+      return undefined;
     }
-  }
-  // process childProcesses
-  if (childProcesses && childProcesses.length) {
-    const execChildProcess = (childName, index, steps) => {
-      const childStep = ejectSteps.find(({ name }) => name === childName);
-      childStep.parent = step;
-      return execStep(childStep, index, steps);
-    };
-    if (!exectable) {
-      log(`<green [Step ${name}]/> <yellow Waiting child processes until they are done... />`).write();
-      step.executed = Promise.all(childProcesses.map(execChildProcess)).then((result) => {
-        log(`<green [Step ${name}]/> <grey Child processes were done. />`).write();
-        log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
-        return result;
-      });
+    await undo(args, step);
+    log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  was undone. />`).write();
+    return undefined;
+  };
+  try {
+    step.isExecuted = true;
+    const exectable = Boolean(exec);
+    log(`<green [Step ${name}]/> <yellow Step /><cyan ${name}/><yellow  started />`).write();
+    const isAsync = exec && exec.constructor.name === 'AsyncFunction';
+    if (exec && exec.constructor.name === 'AsyncFunction') {
+      let checkingIndex = index;
+      let previousStep = steps[checkingIndex - 1];
+      // find closest previous sync step
+      while (
+        previousStep &&
+        !previousStep.isExecuted &&
+        ((previousStep.parent && parent) ||
+          (!previousStep.parent && !parent)) &&
+        (!previousStep.exec ||
+          !previousStep.childProcesses ||
+          !previousStep.childProcesses.length ||
+          previousStep.exec.constructor.name === 'AsyncFunction')
+      ) {
+        checkingIndex--;
+        previousStep = steps[checkingIndex];
+      }
+      // wait until closest previous sync step done
+      if (steps[checkingIndex + 1] && steps[checkingIndex + 1].executed) {
+        log(`<green [Step ${name}]/> <yellow Waiting for /><cyan ${
+          steps[checkingIndex + 1].name
+        }/><yellow until it is done... />`).write();
+        await steps[checkingIndex + 1].executed;
+        log(`<green [Step ${name}]/> <grey Step /><cyan ${
+          steps[checkingIndex + 1].name
+        }/><grey  was done. />`).write();
+      }
+    }
+    // process childProcesses
+    if (childProcesses && childProcesses.length) {
+      const execChildProcess = (childName, index, steps) => {
+        const childStep = ejectSteps.find(({ name }) => name === childName);
+        childStep.parent = step;
+        return execStep(childStep, index, steps);
+      };
+      if (!exectable) {
+        log(`<green [Step ${name}]/> <yellow Waiting child processes until they are done... />`).write();
+        step.executed = Promise.all(childProcesses.map(execChildProcess)).then((result) => {
+          log(`<green [Step ${name}]/> <grey Child processes were done. />`).write();
+          log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
+          return result;
+        });
 
-      return step.executed;
+        return step.executed;
+      }
+      log(`<green [Step ${name}]/> <yellow Waiting child processes until they are done... />`).write();
+
+      await Promise.all(childProcesses.map(childProcesses.map(execChildProcess)));
+
+      log(`<green [Step ${name}]/> <grey Child processes were done. />`).write();
     }
-    log(`<green [Step ${name}]/> <yellow Waiting child processes until they are done... />`).write();
-    await Promise.all(childProcesses.map(childProcesses.map(execChildProcess)));
-    log(`<green [Step ${name}]/> <grey Child processes were done. />`).write();
-  }
-  if (exectable) {
-    log(`<green [Step ${name}]/> <yellow Step /><cyan ${name}/><yellow  Executing... />`).write();
-    step.executed = exec(args, step);
-    if (!isAsync) {
-      log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
-      return step.executed;
+    if (exectable) {
+      log(`<green [Step ${name}]/> <yellow Step /><cyan ${name}/><yellow  is executing... />`).write();
+      step.executed = exec(args, step);
+      if (!isAsync) {
+        log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
+        return step.executed;
+      }
+      return step.executed
+        .then((result) => {
+          log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
+          return result;
+        })
+        .catch(error => catchHandle(error));
     }
-    return step.executed.then((result) => {
-      log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
-      return result;
-    });
+    log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
+    return undefined;
+  } catch (error) {
+    return catchHandle(error);
   }
-  log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
-  return undefined;
 };
 // exec all eject steps
 ejectSteps.forEach(execStep);
