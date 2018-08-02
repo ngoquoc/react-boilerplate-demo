@@ -5,7 +5,7 @@ const fs = require('fs');
 /**
  * final args object
  */
-const args = {};
+const cliArgs = {};
 /**
  * possible args
  */
@@ -318,14 +318,14 @@ const ejectSteps = [
  * exec all eject steps
  * @param {*} ejectStep
  */
-const execStep = async (step, index, steps) => {
+const execStep = async (args, step, index, steps) => {
   const {
     name, exec, undo, childProcesses, parent, isExecuted,
   } = step;
   if (isExecuted) {
     return step.executed;
   }
-  const catchHandle = async (error) => {
+  const errorHandle = async (error) => {
     log(`<red [Step ${name}] Failed to execute because of following error:/>\n<white ${
       error.stack
     }/>`);
@@ -380,7 +380,7 @@ const execStep = async (step, index, steps) => {
       const execChildProcess = (childName, index, steps) => {
         const childStep = ejectSteps.find(({ name }) => name === childName);
         childStep.parent = step;
-        return execStep(childStep, index, steps);
+        return execStep(args, childStep, index, steps);
       };
       if (!exectable) {
         log(`<green [Step ${name}]/> <yellow Waiting child processes until they are done... />`).write();
@@ -400,22 +400,24 @@ const execStep = async (step, index, steps) => {
     }
     if (exectable) {
       log(`<green [Step ${name}]/> <yellow Step /><cyan ${name}/><yellow  is executing... />`).write();
-      step.executed = exec(args, step);
+
       if (!isAsync) {
+        step.executed = exec(args, step);
         log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
         return step.executed;
       }
-      return step.executed
-        .then((result) => {
+      step.executed = exec(args, step)
+        .then(result => {
           log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
           return result;
         })
-        .catch(error => catchHandle(error));
+        .catch(error => errorHandle(error));
+      return step.executed;
     }
     log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
     return undefined;
   } catch (error) {
-    return catchHandle(error);
+    return errorHandle(error);
   }
 };
 // exec all eject steps
@@ -423,8 +425,7 @@ const stdin = process.openStdin();
 log(`
   <white You are going to eject example app from this boilerplate. />
   <yellow Please note that this action CANNOT be UNDONE!/>
-  <white Are you sure to continue?(Y/N) Default is "N" />
-  `).write();
+  <white Are you sure to continue?(Y/N) Default is "N" />`).write();
 stdin.addListener('data', (answer) => {
   switch (
     answer
@@ -434,13 +435,14 @@ stdin.addListener('data', (answer) => {
   ) {
     case 'y': {
       // exec all eject steps
-      Promise.all(ejectSteps.map((...args) => execStep(...args)))
-        .then(process.exit(0))
-        .catch(process.exit(1));
+      Promise.all(ejectSteps.map((...args) => execStep(cliArgs, ...args)))
+        .then(() => process.exit(0))
+        .catch(() => process.exit(1));
       break;
     }
     case 'n':
     default: {
+      log('<grey Action cancelled./>').write();
       process.exit(0);
     }
   }
