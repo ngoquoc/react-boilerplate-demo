@@ -1,6 +1,83 @@
 const { log } = require('jsuti');
 const path = require('path');
 const fs = require('fs');
+
+/**
+ * Process commented tags in HTML or JS string
+ * @param {*} tagName
+ * @param {*} html
+ * @param {*} args
+ */
+const processTags = (tagName, html, args) => {
+  if (!html) {
+    return;
+  }
+  /**
+   * Support in HTML:
+   *  <!-- eject:args.title -->
+   *  <title>My title</title>
+   *  <!-- /eject:args.title -->
+   * Support in JS:
+   *  // <!-- eject:args.title -->
+   *  pageTitle = 'My title';
+   *  // <!-- /eject:args.title -->
+   */
+  const testString = `(\\/\\/ |)<!-- ${tagName}:(((?!-->).)*) -->(((?!<!-- \\/${tagName}:).)*)(\\/\\/ |)<!-- \\/${tagName}:(((?!-->).)*) -->`;
+  const tagTest = new RegExp(testString, 'g');
+  return html
+    .replace(/\r\n|\r|\n/g, '<newline />')
+    .replace(tagTest, (matchString) => {
+      const match = new RegExp(testString).exec(matchString);
+      const openTag = match[2];
+      const tagContent = match[4];
+      const closeTag = match[7];
+      if (
+        !openTag ||
+        !tagContent ||
+        !closeTag ||
+        (openTag !== closeTag && !openTag.startsWith(closeTag))
+      ) {
+        throw new Error('There are invalid eject tags in your document! Please check if you missed content, spaces between "<!--" or "-->" and tag name, missed or added wrong closing tags.');
+      }
+      const propMatch = new RegExp(
+        `^${closeTag} ((( *)(([a-z-]+)='([^']+)'))*)`,
+        'g'
+      );
+      let propsString = '';
+      if (propMatch.test(openTag)) {
+        propsString = openTag.replace(`${closeTag} `, '');
+      }
+      const props = {};
+      if (propsString) {
+        const propTest = /( *)(([a-z-]+)='([^']+)')/g;
+        const matches = propsString.match(propTest);
+        if (matches) {
+          matches.forEach((propString) => {
+            const propParse = propTest.exec(propsString);
+            const propKey = propParse[3];
+            const propValue = propParse[4];
+            props[propKey] = propValue;
+          });
+        }
+      }
+
+      switch (closeTag) {
+        case 'args.title': {
+          return `<title>${args.name}</title>`;
+        }
+        case 'remove': {
+          return '';
+        }
+        case 'replace': {
+          if (!props.with) {
+            throw new Error('eject:replace tag must has \'with\' property');
+          }
+          return props.with;
+        }
+      }
+    })
+    .replace(/<newline \/>/g, '\n');
+};
 // configs
 /**
  * final args object
@@ -215,14 +292,76 @@ const ejectSteps = [
   // / eject config.dev.json
   {
     name: STEPS.EJECT_CONFIG_DEV_JSON,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      const backupPath = path.join(
+        __dirname,
+        '..',
+        'config',
+        'config.dev.bk.json'
+      );
+      const configPath = path.join(
+        __dirname,
+        '..',
+        'config',
+        'config.dev.json'
+      );
+      fs.copyFileSync(configPath, backupPath);
+      fs.writeFileSync(configPath, '{}');
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(
+        __dirname,
+        '..',
+        'config',
+        'config.dev.bk.json'
+      );
+      const configPath = path.join(
+        __dirname,
+        '..',
+        'config',
+        'config.dev.json'
+      );
+      fs.unlinkSync(configPath);
+      fs.copyFileSync(backupPath, configPath);
+    },
   },
   // / eject config.prod.json
   {
     name: STEPS.EJECT_CONFIG_PROD_JSON,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      const backupPath = path.join(
+        __dirname,
+        '..',
+        'config',
+        'config.prod.bk.json'
+      );
+      const configPath = path.join(
+        __dirname,
+        '..',
+        'config',
+        'config.prod.json'
+      );
+      fs.copyFileSync(configPath, backupPath);
+      fs.writeFileSync(configPath, '{}');
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(
+        __dirname,
+        '..',
+        'config',
+        'config.prod.bk.json'
+      );
+      const configPath = path.join(
+        __dirname,
+        '..',
+        'config',
+        'config.prod.json'
+      );
+      fs.unlinkSync(configPath);
+      fs.copyFileSync(backupPath, configPath);
+    },
   },
   // eject public assets
   {
@@ -237,20 +376,58 @@ const ejectSteps = [
   // / eject assets
   {
     name: STEPS.EJECT_ASSETS,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      const backupPath = path.join(__dirname, '..', 'public', 'assets-bk');
+      const assetsPath = path.join(__dirname, '..', 'public', 'assets');
+      fs.renameSync(assetsPath, backupPath);
+      fs.mkdirSync(assetsPath);
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(__dirname, '..', 'public', 'assets-bk');
+      const assetsPath = path.join(__dirname, '..', 'public', 'assets');
+      fs.unlinkSync(assetsPath);
+      fs.renameSync(backupPath, assetsPath);
+    },
   },
   // / eject favicon
   {
     name: STEPS.EJECT_FAVICON,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      if (!args.favicon) {
+        return;
+      }
+      const backupPath = path.join(__dirname, '..', 'public', 'favicon.bk.ico');
+      const faviconPath = path.join(__dirname, '..', 'public', 'favicon.ico');
+      fs.renameSync(faviconPath, backupPath);
+      fs.copyFileSync(args.favicon, faviconPath);
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(__dirname, '..', 'public', 'favicon.bk.ico');
+      const faviconPath = path.join(__dirname, '..', 'public', 'favicon.ico');
+      fs.unlinkSync(faviconPath);
+      fs.renameSync(backupPath, faviconPath);
+    },
   },
   // / eject index.html
   {
     name: STEPS.EJECT_INDEX_HTML,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      const backupPath = path.join(__dirname, '..', 'public', 'index.bk.html');
+      const indexPath = path.join(__dirname, '..', 'public', 'index.html');
+      fs.copyFileSync(indexPath, backupPath);
+      const html = fs.readFileSync(indexPath);
+      const ejectedHTML = processTags('eject', html.toString('utf8'), cliArgs);
+      fs.writeFileSync(indexPath, ejectedHTML);
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(__dirname, '..', 'public', 'index.bk.html');
+      const indexPath = path.join(__dirname, '..', 'public', 'index.html');
+      fs.unlinkSync(indexPath);
+      fs.renameSync(backupPath, indexPath);
+    },
   },
   // /eject manifest.json
   {
@@ -407,7 +584,7 @@ const execStep = async (args, step, index, steps) => {
         return step.executed;
       }
       step.executed = exec(args, step)
-        .then(result => {
+        .then((result) => {
           log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
           return result;
         })
