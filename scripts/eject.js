@@ -1,6 +1,7 @@
 const { log } = require('jsuti');
 const path = require('path');
 const fs = require('fs');
+const rimraf = require('rimraf')
 
 /**
  * Process commented tags in HTML or JS string
@@ -381,12 +382,12 @@ const ejectSteps = [
       const assetsPath = path.join(__dirname, '..', 'public', 'assets');
       fs.renameSync(assetsPath, backupPath);
       fs.mkdirSync(assetsPath);
-      fs.unlinkSync(backupPath);
+      rimraf.sync(backupPath);
     },
     undo: async (args, step) => {
       const backupPath = path.join(__dirname, '..', 'public', 'assets-bk');
       const assetsPath = path.join(__dirname, '..', 'public', 'assets');
-      fs.unlinkSync(assetsPath);
+      rimraf.sync(assetsPath);
       fs.renameSync(backupPath, assetsPath);
     },
   },
