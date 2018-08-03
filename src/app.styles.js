@@ -1,4 +1,5 @@
 export default {
+  // <!-- eject:remove -->
   body: {
     margin: '0',
     padding: '0',
@@ -15,7 +16,7 @@ export default {
   content: {
     minHeight: '800px',
   },
-
+  // <!-- /eject:remove -->
   layout: {
     backgroundColor: 'transparent',
   },

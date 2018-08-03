@@ -1,16 +1,40 @@
 import React from 'react';
+// <!-- eject:remove -->
 import { Layout, Menu } from 'antd';
+// <!-- /eject:remove -->
 import injectSheet from 'react-jss';
+// <!-- eject:remove -->
 import { Route, Switch } from 'react-router-dom';
+// <!-- /eject:remove -->
 import PropTypes from 'prop-types';
-import { Header, Footer, Translation } from './components';
+import {
+  Header,
+  Footer,
+  // <!-- eject:remove if='!args.multilingual' -->
+  Translation,
+  // <!-- /eject:remove -->
+} from './components';
+// <!-- eject:remove -->
 import UnauthenticatedLoginMenuItem from './containers/User/LoginMenuItem';
+// <!-- /eject:remove -->
+// <!-- eject:remove if='!args.multilingual' -->
 import enableTranslation from './HOCs/intl/enableTranslation';
+// <!-- /eject:remove -->
+// <!-- eject:remove -->
 import Vehicle from './containers/Vehicle';
+// <!-- /eject:remove -->
 import styles from './app.styles';
 
-const App = ({ classes, translation: { searchTitle, sellTitle } }) => (
+const App = ({
+  classes,
+  // <!-- eject:remove if='!args.multilingual' -->
+  translation: { searchTitle, sellTitle },
+  // <!-- /eject:remove -->
+}) => (
+  // <!-- eject:replace with='  <div className={classes.layout}>' -->
   <Layout className={classes.layout}>
+    {/* <!-- /eject:replace --> */}
+    {/* <!-- eject:replace with='    <Header />' --> */}
     <Header>
       <Menu.SubMenu key="1" title={searchTitle}>
         <Menu.Item key="1.1">
@@ -45,21 +69,30 @@ const App = ({ classes, translation: { searchTitle, sellTitle } }) => (
       </Menu.Item>
       <UnauthenticatedLoginMenuItem key="4" />
     </Header>
+    {/* <!-- /eject:replace --> */}
+    {/* <!-- eject:replace if='!args.multilingual' with='    <div>App content</div>' else='    <div><newline />      <Translation>App content: <newline />      </Translation>searchTitle: {searchTitle}, sellTitle: {sellTitle}<newline />    </div>' --> */}
     <Layout.Content className={classes.content}>
       <Switch>
         <Route path="/" component={Vehicle} />
         <Route path="/vehicle" component={Vehicle} />
       </Switch>
     </Layout.Content>
+    {/* <!-- /eject:replace --> */}
     <Footer />
+    {/* <!-- eject:replace with='  </div>' --> */}
   </Layout>
+  // <!-- /eject:replace -->
 );
 App.propTypes = {
+  // <!-- eject:remove if='!args.multilingual' -->
   translation: PropTypes.object.isRequired,
+  // <!-- /eject:remove -->
   classes: PropTypes.object.isRequired,
 };
 
+// <!-- eject:replace with='export default injectSheet(styles)(App);' if='!args.multilingual' -->
 export default enableTranslation({
   searchTitle: 'SEARCH',
   sellTitle: 'SELL',
 })(injectSheet(styles)(App));
+// <!-- /eject:replace -->
