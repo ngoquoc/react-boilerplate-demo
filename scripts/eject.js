@@ -1,7 +1,7 @@
 const { log, processTags } = require('jsuti');
 const path = require('path');
 const fs = require('fs');
-const rimraf = require('rimraf');
+const del = require('del');
 
 // configs
 /**
@@ -137,6 +137,7 @@ const PATHS = (() => {
   const FOOTER = path.join(COMPONENTS, 'Footer');
   const HEADER = path.join(COMPONENTS, 'Header');
   const LOADER = path.join(COMPONENTS, 'Loader');
+  const HOCS = path.join(SRC, 'HOCs');
   return {
     ROOT,
     CONFIG,
@@ -146,6 +147,7 @@ const PATHS = (() => {
     FOOTER,
     HEADER,
     LOADER,
+    HOCS,
   };
 })();
 /**
@@ -174,7 +176,11 @@ const ejectSteps = [
         const arg = getArg(key);
         if (!arg) {
           const suggestion = possibleArgsKeys.find(arg => arg.contains(key));
-          throw new Error(`Argument ${key} is invalid!`.concat(!suggestion ? '' : `Did you mean "${suggestion}"?`));
+          throw new Error(
+            `Argument ${key} is invalid!`.concat(
+              !suggestion ? '' : `Did you mean "${suggestion}"?`
+            )
+          );
         }
         const { name, default: defaultValue } = arg;
         const valueIndex = index + 1;
@@ -208,9 +214,11 @@ const ejectSteps = [
       };
 
       // finalize args
-      possibleArgs.forEach((arg) => {
+      possibleArgs.forEach(arg => {
         args[arg.name] = valueOrDefault(arg.name, arg);
       });
+
+      args.multilingual = args.multilingual && args.multilingual !== 'false';
     },
   },
   // eject package.json
@@ -218,11 +226,28 @@ const ejectSteps = [
     name: STEPS.EJECT_PACKAGE_JSON,
     exec: async (args, step) => {
       const npmPackages = require('../package.json');
+      const dependencies = Object.keys(npmPackages.dependencies)
+        .filter(
+          package =>
+            package !== 'antd' &&
+            ((!args.multilingual &&
+              package !== 'react-intl' &&
+              package !== 'react-intl-redux') ||
+              args.multilingual)
+        )
+        .reduce(
+          (packages, package) => ({
+            ...packages,
+            [package]: npmPackages.dependencies[package],
+          }),
+          {}
+        );
       const outputPackages = {
         ...npmPackages,
         name: args.package,
         homepage: args.home,
         private: args.private,
+        dependencies,
       };
       // backup current package.json file
       const backupPath = path.join(PATHS.ROOT, 'package.bk.json');
@@ -302,12 +327,12 @@ const ejectSteps = [
       const assetsPath = path.join(PATHS.PUBLIC, 'assets');
       fs.renameSync(assetsPath, backupPath);
       fs.mkdirSync(assetsPath);
-      rimraf.sync(backupPath);
+      del.sync(backupPath);
     },
     undo: async (args, step) => {
       const backupPath = path.join(PATHS.PUBLIC, 'assets-bk');
       const assetsPath = path.join(PATHS.PUBLIC, 'assets');
-      rimraf.sync(assetsPath);
+      del.sync(assetsPath);
       fs.renameSync(backupPath, assetsPath);
     },
   },
@@ -464,6 +489,35 @@ const ejectSteps = [
   // / eject components
   {
     name: STEPS.EJECT_COMPONENTS,
+    exec: async (args, step) => {
+      // eject Translation
+      const backupPath = path.join(PATHS.COMPONENTS, 'Translation-bk');
+      const translationPath = path.join(PATHS.COMPONENTS, 'Translation');
+      fs.renameSync(translationPath, backupPath);
+      fs.mkdirSync(translationPath);
+      // eject index.js
+      const indexBackupPath = path.join(PATHS.COMPONENTS, 'index.bk.js');
+      const indexPath = path.join(PATHS.COMPONENTS, 'index.js');
+      fs.copyFileSync(indexPath, indexBackupPath);
+      const js = fs.readFileSync(indexPath);
+      const ejectedJS = processTags('eject', js.toString('utf8'), cliArgs);
+      fs.writeFileSync(indexPath, ejectedJS);
+
+      del.sync(backupPath);
+      fs.unlinkSync(indexBackupPath);
+    },
+    undo: async () => {
+      // undo eject Translation
+      const backupPath = path.join(PATHS.COMPONENTS, 'Translation-bk');
+      const translationPath = path.join(PATHS.COMPONENTS, 'Translation');
+      del.sync(translationPath);
+      fs.renameSync(backupPath, translationPath);
+      // undo index.js
+      const indexBackupPath = path.join(PATHS.COMPONENTS, 'index.bk.js');
+      const indexPath = path.join(PATHS.COMPONENTS, 'index.js');
+      fs.unlinkSync(indexPath);
+      fs.renameSync(indexBackupPath, indexPath);
+    },
     childProcesses: [
       STEPS.EJECT_FOOTER,
       STEPS.EJECT_HEADER,
@@ -593,26 +647,105 @@ const ejectSteps = [
   // /eject containers
   {
     name: STEPS.EJECT_CONTAINERS,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'containers-bk');
+      const containersPath = path.join(PATHS.SRC, 'containers');
+      fs.renameSync(containersPath, backupPath);
+      fs.mkdirSync(containersPath);
+      del.sync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'containers-bk');
+      const containersPath = path.join(PATHS.SRC, 'containers');
+      del.sync(containersPath);
+      fs.renameSync(backupPath, containersPath);
+    },
   },
   // /eject HOCs
   {
     name: STEPS.EJECT_HOCS,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      // eject auth
+      const authBackupPath = path.join(PATHS.HOCS, 'auth-bk');
+      const authPath = path.join(PATHS.HOCS, 'auth');
+      fs.renameSync(authPath, authBackupPath);
+      fs.mkdirSync(authPath);
+
+      // eject intl
+      if (!args.multilingual) {
+        const intlBackupPath = path.join(PATHS.HOCS, 'intl-bk');
+        const intlPath = path.join(PATHS.HOCS, 'intl');
+        fs.renameSync(intlPath, intlBackupPath);
+        fs.mkdirSync(intlPath);
+        del.sync(intlBackupPath);
+      }
+      del.sync(authBackupPath);
+    },
+    undo: async (args, step) => {
+      // undo eject auth
+      const authBackupPath = path.join(PATHS.HOCS, 'auth-bk');
+      const authPath = path.join(PATHS.HOCS, 'auth');
+      del.sync(authPath);
+      fs.renameSync(authBackupPath, authPath);
+      // undo eject intl
+      if (!args.multilingual) {
+        const intlBackupPath = path.join(PATHS.HOCS, 'intl-bk');
+        const intlPath = path.join(PATHS.HOCS, 'intl');
+        del.sync(intlPath);
+        fs.renameSync(intlBackupPath, intlPath);
+      }
+    },
   },
   // /eject intl
   {
     name: STEPS.EJECT_INTL,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      if (!args.multilingual) {
+        const intlBackupPath = path.join(PATHS.SRC, 'intl-bk');
+        const intlPath = path.join(PATHS.SRC, 'intl');
+        fs.renameSync(intlPath, intlBackupPath);
+        fs.mkdirSync(intlPath);
+        del.sync(intlBackupPath);
+        return;
+      }
+      const backupPath = path.join(PATHS.SRC, 'intl', 'en-US.bk.js');
+      const enUSJSPath = path.join(PATHS.SRC, 'intl', 'en-US.js');
+      fs.copyFileSync(enUSJSPath, backupPath);
+      const loaderJS = fs.readFileSync(enUSJSPath);
+      const enUSJS = processTags('eject', loaderJS.toString('utf8'), cliArgs);
+      fs.writeFileSync(enUSJSPath, enUSJS);
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      if (!args.multilingual) {
+        const intlBackupPath = path.join(PATHS.SRC, 'intl-bk');
+        const intlPath = path.join(PATHS.SRC, 'intl');
+        del.sync(intlPath);
+        fs.renameSync(intlBackupPath, intlPath);
+        return;
+      }
+      const backupPath = path.join(PATHS.SRC, 'intl', 'en-US.bk.js');
+      const enUSJSPath = path.join(PATHS.SRC, 'intl', 'en-US.js');
+      fs.unlinkSync(enUSJSPath);
+      fs.renameSync(backupPath, enUSJSPath);
+    },
   },
   // /eject mockData
   {
     name: STEPS.EJECT_MOCK_DATA,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'mockData-bk');
+      const mockDataPath = path.join(PATHS.SRC, 'mockData');
+      fs.renameSync(mockDataPath, backupPath);
+      fs.mkdirSync(mockDataPath);
+      del.sync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'mockData-bk');
+      const mockDataPath = path.join(PATHS.SRC, 'mockData');
+      del.sync(mockDataPath);
+      fs.renameSync(backupPath, mockDataPath);
+    },
   },
 ];
 /**
@@ -620,33 +753,41 @@ const ejectSteps = [
  * @param {*} ejectStep
  */
 const execStep = async (args, step, index, steps) => {
-  const {
-    name, exec, undo, childProcesses, parent, isExecuted,
-  } = step;
+  const { name, exec, undo, childProcesses, parent, isExecuted } = step;
   if (isExecuted) {
     return step.executed;
   }
-  const errorHandle = async (error) => {
-    log(`<red [Step ${name}] Failed to execute because of following error:/>\n<white ${
-      error.stack
-    }/>`);
+  const errorHandle = async error => {
+    log(
+      `<red [Step ${name}] Failed to execute because of following error:/>\n<white ${
+        error.stack
+      }/>`
+    );
     if (!undo) {
       return undefined;
     }
-    log(`<green [Step ${name}]/> <yellow Undoing step /><cyan ${name}/><yellow .../>`);
+    log(
+      `<green [Step ${name}]/> <yellow Undoing step /><cyan ${name}/><yellow .../>`
+    );
     if (undo.constructor.name !== 'AsyncFunction') {
       undo(args, step);
-      log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  was undone. />`).write();
+      log(
+        `<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  was undone. />`
+      ).write();
       return undefined;
     }
     await undo(args, step);
-    log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  was undone. />`).write();
+    log(
+      `<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  was undone. />`
+    ).write();
     return undefined;
   };
   try {
     step.isExecuted = true;
     const exectable = Boolean(exec);
-    log(`<green [Step ${name}]/> <yellow Step /><cyan ${name}/><yellow  started />`).write();
+    log(
+      `<green [Step ${name}]/> <yellow Step /><cyan ${name}/><yellow  started />`
+    ).write();
     const isAsync = exec && exec.constructor.name === 'AsyncFunction';
     if (exec && exec.constructor.name === 'AsyncFunction') {
       let checkingIndex = index;
@@ -667,13 +808,17 @@ const execStep = async (args, step, index, steps) => {
       }
       // wait until closest previous sync step done
       if (steps[checkingIndex + 1] && steps[checkingIndex + 1].executed) {
-        log(`<green [Step ${name}]/> <yellow Waiting for /><cyan ${
-          steps[checkingIndex + 1].name
-        }/><yellow until it is done... />`).write();
+        log(
+          `<green [Step ${name}]/> <yellow Waiting for /><cyan ${
+            steps[checkingIndex + 1].name
+          }/><yellow until it is done... />`
+        ).write();
         await steps[checkingIndex + 1].executed;
-        log(`<green [Step ${name}]/> <grey Step /><cyan ${
-          steps[checkingIndex + 1].name
-        }/><grey  was done. />`).write();
+        log(
+          `<green [Step ${name}]/> <grey Step /><cyan ${
+            steps[checkingIndex + 1].name
+          }/><grey  was done. />`
+        ).write();
       }
     }
     // process childProcesses
@@ -684,38 +829,58 @@ const execStep = async (args, step, index, steps) => {
         return execStep(args, childStep, index, steps);
       };
       if (!exectable) {
-        log(`<green [Step ${name}]/> <yellow Waiting child processes until they are done... />`).write();
-        step.executed = Promise.all(childProcesses.map(execChildProcess)).then((result) => {
-          log(`<green [Step ${name}]/> <grey Child processes were done. />`).write();
-          log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
-          return result;
-        });
+        log(
+          `<green [Step ${name}]/> <yellow Waiting child processes until they are done... />`
+        ).write();
+        step.executed = Promise.all(childProcesses.map(execChildProcess)).then(
+          result => {
+            log(
+              `<green [Step ${name}]/> <grey Child processes were done. />`
+            ).write();
+            log(
+              `<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`
+            ).write();
+            return result;
+          }
+        );
 
         return step.executed;
       }
-      log(`<green [Step ${name}]/> <yellow Waiting child processes until they are done... />`).write();
+      log(
+        `<green [Step ${name}]/> <yellow Waiting child processes until they are done... />`
+      ).write();
 
-      await Promise.all(childProcesses.map(childProcesses.map(execChildProcess)));
+      await Promise.all(childProcesses.map(execChildProcess));
 
-      log(`<green [Step ${name}]/> <grey Child processes were done. />`).write();
+      log(
+        `<green [Step ${name}]/> <grey Child processes were done. />`
+      ).write();
     }
     if (exectable) {
-      log(`<green [Step ${name}]/> <yellow Step /><cyan ${name}/><yellow  is executing... />`).write();
+      log(
+        `<green [Step ${name}]/> <yellow Step /><cyan ${name}/><yellow  is executing... />`
+      ).write();
 
       if (!isAsync) {
         step.executed = exec(args, step);
-        log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
+        log(
+          `<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`
+        ).write();
         return step.executed;
       }
       step.executed = exec(args, step)
-        .then((result) => {
-          log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
+        .then(result => {
+          log(
+            `<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`
+          ).write();
           return result;
         })
         .catch(error => errorHandle(error));
       return step.executed;
     }
-    log(`<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`).write();
+    log(
+      `<green [Step ${name}]/> <grey Step /><cyan ${name}/><grey  executed. />`
+    ).write();
     return undefined;
   } catch (error) {
     return errorHandle(error);
@@ -726,7 +891,7 @@ const stdin = process.openStdin();
 log('<white You are going to eject example app from this boilerplate./>');
 log('<yellow Please note that this action CANNOT be UNDONE!/>');
 log('<white Are you sure to continue?(Y/N) Default is "N" />').write();
-stdin.addListener('data', (answer) => {
+stdin.addListener('data', answer => {
   switch (
     answer
       .toString()
