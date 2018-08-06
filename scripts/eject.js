@@ -56,8 +56,10 @@ const processTags = (tagName, html, args) => {
         const matches = propsString.match(propTest);
         if (matches) {
           // parse key='value' pairs
-          matches.forEach((propString) => {
-            const propParse = propTest.exec(propsString);
+          matches.forEach((propString, index, arr) => {
+            // reset interator, check https://stackoverflow.com/questions/11477415/why-does-javascripts-regex-exec-not-always-return-the-same-value
+            propTest.lastIndex = 0;
+            const propParse = propTest.exec(propString);
             const propKey = propParse[3];
             let propValue = propParse[4];
             if (propKey !== 'if') {
@@ -66,17 +68,18 @@ const processTags = (tagName, html, args) => {
             }
             // process if prop
             propValue = propValue.replace(argExtraction, (valueMatch) => {
-              const match = argExtraction.exec(valueMatch);
-              if (!match || !match[2]) {
+              const propValueMatch = argExtraction.exec(valueMatch);
+              if (!propValueMatch || !propValueMatch[2]) {
                 throw new Error(`Value in "if" property of "${closeTag}" tag is invalid!`);
               }
-              const argKey = match[2];
+              const argKey = propValueMatch[2];
               return valueMatch.replace(
                 `args.${argKey}`,
                 args[argKey].toString()
               );
             });
             // evaluate condition
+            // eslint-disable-next-line no-eval
             props[propKey] = eval(propValue);
           });
         }
@@ -460,7 +463,7 @@ const ejectSteps = [
         short_name: args.shortName,
       };
       fs.copyFileSync(manifestPath, backupPath);
-      fs.writeFileSync(manifestPath, outputManifest);
+      fs.writeFileSync(manifestPath, JSON.stringify(outputManifest,null, 2));
       fs.unlinkSync(backupPath);
     },
     undo: async (args, step) => {
@@ -499,7 +502,11 @@ const ejectSteps = [
       const stylePath = path.join(PATHS.SRC, 'app.styles.js');
       fs.copyFileSync(stylePath, backupStylePath);
       const styleJS = fs.readFileSync(stylePath);
-      const ejectedStyle = processTags('eject', styleJS.toString('utf8'), cliArgs);
+      const ejectedStyle = processTags(
+        'eject',
+        styleJS.toString('utf8'),
+        cliArgs
+      );
       fs.writeFileSync(stylePath, ejectedStyle);
       fs.unlinkSync(backupPath);
       fs.unlinkSync(backupStylePath);
