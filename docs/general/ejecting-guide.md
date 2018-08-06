@@ -6,6 +6,8 @@ Once you have done that, this document is intended to guide you how to eject exa
 
 _NOTE: Please leave any unmentioned file/folder/component AS IS as modifying it will CAUSE UNEXPECTED EFFECTS to your app._
 
+**You can either eject the example using `npm run eject` or eject them using below steps.**
+
 ## Config
 
 Replace `config.dev.json` and `config.prod.json`'s content with `{}`. Then add your own app's configs for each environment.
