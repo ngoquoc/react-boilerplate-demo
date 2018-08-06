@@ -1,120 +1,8 @@
-const { log } = require('jsuti');
+const { log, processTags } = require('jsuti');
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
 
-/**
- * Process commented tags in HTML or JS string
- * @param {*} tagName
- * @param {*} html
- * @param {*} args
- */
-const processTags = (tagName, html, args) => {
-  if (!html) {
-    return;
-  }
-  /**
-   * Support in HTML:
-   *  <!-- eject:args.title -->
-   *  <title>My title</title>
-   *  <!-- /eject:args.title -->
-   * Support in JS:
-   *  // <!-- eject:args.title -->
-   *  pageTitle = 'My title';
-   *  // <!-- /eject:args.title -->
-   */
-  const testString = `[ \t]*(// |{/\\* |)<!-- ${tagName}:(((?!-->).)*) -->(((?![ \t]*(// |)<!-- /${tagName}:).)*)[ \t]*(// |)<!-- /${tagName}:(((?!-->).)*) -->( \\*/}|)`;
-  const tagTest = new RegExp(testString, 'g');
-  return html
-    .replace(/\r\n|\r|\n/g, '<newline />')
-    .replace(tagTest, (matchString) => {
-      const match = new RegExp(testString).exec(matchString);
-      const openTag = match[2];
-      const tagContent = match[4];
-      const closeTag = match[8];
-      if (
-        !openTag ||
-        !tagContent ||
-        !closeTag ||
-        (openTag !== closeTag && !openTag.startsWith(`${closeTag} `))
-      ) {
-        throw new Error('There are invalid eject tags in your document! Please check if you missed content, spaces between "<!--" or "-->" and tag name, missed or added wrong closing tags.');
-      }
-      const propMatch = new RegExp(
-        `^${closeTag} ((( *)(([a-z-]+)='([^']+)'))*)`,
-        'g'
-      );
-      let propsString = '';
-      if (propMatch.test(openTag)) {
-        propsString = openTag.replace(`${closeTag} `, '');
-      }
-      const props = {};
-      // determine if there is any prop in eject tag
-      const argExtraction = /([^a-zA-Z_]|^)args\.([a-zA-Z_]([a-zA-Z0-9_]*))/g;
-      const propTest = /( *)(([a-z-]+)='([^']+)')/g;
-      if (propsString) {
-        const matches = propsString.match(propTest);
-        if (matches) {
-          // parse key='value' pairs
-          matches.forEach((propString, index, arr) => {
-            // reset interator, check https://stackoverflow.com/questions/11477415/why-does-javascripts-regex-exec-not-always-return-the-same-value
-            propTest.lastIndex = 0;
-            const propParse = propTest.exec(propString);
-            const propKey = propParse[3];
-            let propValue = propParse[4];
-            if (propKey !== 'if') {
-              props[propKey] = propValue;
-              return;
-            }
-            // process if prop
-            propValue = propValue.replace(argExtraction, (valueMatch) => {
-              const propValueMatch = argExtraction.exec(valueMatch);
-              if (!propValueMatch || !propValueMatch[2]) {
-                throw new Error(`Value in "if" property of "${closeTag}" tag is invalid!`);
-              }
-              const argKey = propValueMatch[2];
-              return valueMatch.replace(
-                `args.${argKey}`,
-                args[argKey].toString()
-              );
-            });
-            // evaluate condition
-            // eslint-disable-next-line no-eval
-            props[propKey] = eval(propValue);
-          });
-        }
-      }
-      // prevent ejection if "if condition" is false
-      if (typeof props.if !== 'undefined' && !props.if) {
-        if (closeTag !== 'replace') {
-          return tagContent;
-        }
-        if (!props.else) {
-          return tagContent;
-        }
-        return props.else;
-      }
-
-      switch (closeTag) {
-        case 'args.title': {
-          return `<title>${args.name}</title>`;
-        }
-        case 'remove': {
-          return '';
-        }
-        case 'replace': {
-          if (!props.with) {
-            throw new Error('eject:replace tag must has \'with\' property');
-          }
-          return props.with;
-        }
-        default: {
-          return tagContent;
-        }
-      }
-    })
-    .replace(/<newline \/>/g, '\n');
-};
 // configs
 /**
  * final args object
@@ -227,7 +115,11 @@ const STEPS = {
   EJECT_SRC: 'eject src',
   EJECT_APP_JS: 'eject app.js',
   EJECT_CONFIG_JS: 'eject config.js',
+  EJECT_REDUCER_JS: 'eject reducer.js',
   EJECT_COMPONENTS: 'eject components',
+  EJECT_FOOTER: 'eject Footer',
+  EJECT_HEADER: 'eject Header',
+  EJECT_LOADER: 'eject Loader',
   EJECT_CONTAINERS: 'eject containers',
   EJECT_HOCS: 'eject HOCs',
   EJECT_INTL: 'eject intl',
@@ -241,11 +133,19 @@ const PATHS = (() => {
   const CONFIG = path.join(ROOT, 'config');
   const PUBLIC = path.join(ROOT, 'public');
   const SRC = path.join(ROOT, 'src');
+  const COMPONENTS = path.join(SRC, 'components');
+  const FOOTER = path.join(COMPONENTS, 'Footer');
+  const HEADER = path.join(COMPONENTS, 'Header');
+  const LOADER = path.join(COMPONENTS, 'Loader');
   return {
     ROOT,
     CONFIG,
     PUBLIC,
     SRC,
+    COMPONENTS,
+    FOOTER,
+    HEADER,
+    LOADER,
   };
 })();
 /**
@@ -463,7 +363,7 @@ const ejectSteps = [
         short_name: args.shortName,
       };
       fs.copyFileSync(manifestPath, backupPath);
-      fs.writeFileSync(manifestPath, JSON.stringify(outputManifest,null, 2));
+      fs.writeFileSync(manifestPath, JSON.stringify(outputManifest, null, 2));
       fs.unlinkSync(backupPath);
     },
     undo: async (args, step) => {
@@ -479,6 +379,7 @@ const ejectSteps = [
     childProcesses: [
       STEPS.EJECT_APP_JS,
       STEPS.EJECT_CONFIG_JS,
+      STEPS.EJECT_REDUCER_JS,
       STEPS.EJECT_COMPONENTS,
       STEPS.EJECT_CONTAINERS,
       STEPS.EJECT_HOCS,
@@ -525,14 +426,169 @@ const ejectSteps = [
   // / eject config.js
   {
     name: STEPS.EJECT_CONFIG_JS,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    exec: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'config.bk.js');
+      const configPath = path.join(PATHS.SRC, 'config.js');
+      fs.copyFileSync(configPath, backupPath);
+      const js = fs.readFileSync(configPath);
+      const ejectedJS = processTags('eject', js.toString('utf8'), cliArgs);
+      fs.writeFileSync(configPath, ejectedJS);
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'config.bk.js');
+      const configPath = path.join(PATHS.SRC, 'config.js');
+      fs.unlinkSync(configPath);
+      fs.renameSync(backupPath, configPath);
+    },
+  },
+  // / eject reducer.js
+  {
+    name: STEPS.EJECT_REDUCER_JS,
+    exec: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'reducer.bk.js');
+      const reducerPath = path.join(PATHS.SRC, 'reducer.js');
+      fs.copyFileSync(reducerPath, backupPath);
+      const js = fs.readFileSync(reducerPath);
+      const ejectedJS = processTags('eject', js.toString('utf8'), cliArgs);
+      fs.writeFileSync(reducerPath, ejectedJS);
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'reducer.bk.js');
+      const reducerPath = path.join(PATHS.SRC, 'reducer.js');
+      fs.unlinkSync(reducerPath);
+      fs.renameSync(backupPath, reducerPath);
+    },
   },
   // / eject components
   {
     name: STEPS.EJECT_COMPONENTS,
-    exec: async (args, step) => {},
-    undo: async (args, step) => {},
+    childProcesses: [
+      STEPS.EJECT_FOOTER,
+      STEPS.EJECT_HEADER,
+      STEPS.EJECT_LOADER,
+    ],
+  },
+  // / eject Footer
+  {
+    name: STEPS.EJECT_FOOTER,
+    exec: async (args, step) => {
+      // eject Footer.js
+      const backupPath = path.join(PATHS.FOOTER, 'Footer.bk.js');
+      const footerJSPath = path.join(PATHS.FOOTER, 'Footer.js');
+      fs.copyFileSync(footerJSPath, backupPath);
+      const footerJS = fs.readFileSync(footerJSPath);
+      const ejectedFooter = processTags(
+        'eject',
+        footerJS.toString('utf8'),
+        cliArgs
+      );
+      fs.writeFileSync(footerJSPath, ejectedFooter);
+      // eject footer.styles.js
+      const backupStylePath = path.join(PATHS.FOOTER, 'footer.styles.bk.js');
+      const stylePath = path.join(PATHS.FOOTER, 'footer.styles.js');
+      fs.copyFileSync(stylePath, backupStylePath);
+      const styleJS = fs.readFileSync(stylePath);
+      const ejectedStyle = processTags(
+        'eject',
+        styleJS.toString('utf8'),
+        cliArgs
+      );
+      fs.writeFileSync(stylePath, ejectedStyle);
+      fs.unlinkSync(backupPath);
+      fs.unlinkSync(backupStylePath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.FOOTER, 'Footer.bk.js');
+      const footerJSPath = path.join(PATHS.FOOTER, 'Footer.js');
+      fs.unlinkSync(footerJSPath);
+      fs.renameSync(backupPath, footerJSPath);
+      const backupStylePath = path.join(PATHS.FOOTER, 'footer.styles.bk.js');
+      const stylePath = path.join(PATHS.FOOTER, 'footer.styles.js');
+      fs.unlinkSync(stylePath);
+      fs.renameSync(backupStylePath, stylePath);
+    },
+  },
+  // / eject Header
+  {
+    name: STEPS.EJECT_HEADER,
+    exec: async (args, step) => {
+      // eject App.js
+      const backupPath = path.join(PATHS.HEADER, 'Header.bk.js');
+      const headerJSPath = path.join(PATHS.HEADER, 'Header.js');
+      fs.copyFileSync(headerJSPath, backupPath);
+      const headerJS = fs.readFileSync(headerJSPath);
+      const ejectedApp = processTags(
+        'eject',
+        headerJS.toString('utf8'),
+        cliArgs
+      );
+      fs.writeFileSync(headerJSPath, ejectedApp);
+      // eject app.styles.js
+      const backupStylePath = path.join(PATHS.HEADER, 'header.styles.bk.js');
+      const stylePath = path.join(PATHS.HEADER, 'header.styles.js');
+      fs.copyFileSync(stylePath, backupStylePath);
+      const styleJS = fs.readFileSync(stylePath);
+      const ejectedStyle = processTags(
+        'eject',
+        styleJS.toString('utf8'),
+        cliArgs
+      );
+      fs.writeFileSync(stylePath, ejectedStyle);
+      fs.unlinkSync(backupPath);
+      fs.unlinkSync(backupStylePath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.HEADER, 'Header.bk.js');
+      const headerJSPath = path.join(PATHS.HEADER, 'Header.js');
+      fs.unlinkSync(headerJSPath);
+      fs.renameSync(backupPath, headerJSPath);
+      const backupStylePath = path.join(PATHS.HEADER, 'header.styles.bk.js');
+      const stylePath = path.join(PATHS.HEADER, 'header.styles.js');
+      fs.unlinkSync(stylePath);
+      fs.renameSync(backupStylePath, stylePath);
+    },
+  },
+  // / eject Loader
+  {
+    name: STEPS.EJECT_LOADER,
+    exec: async (args, step) => {
+      // eject Loader.js
+      const backupPath = path.join(PATHS.LOADER, 'Loader.bk.js');
+      const loaderJSPath = path.join(PATHS.LOADER, 'Loader.js');
+      fs.copyFileSync(loaderJSPath, backupPath);
+      const loaderJS = fs.readFileSync(loaderJSPath);
+      const ejectedLoader = processTags(
+        'eject',
+        loaderJS.toString('utf8'),
+        cliArgs
+      );
+      fs.writeFileSync(loaderJSPath, ejectedLoader);
+      // eject loader.styles.js
+      const backupStylePath = path.join(PATHS.LOADER, 'loader.styles.bk.js');
+      const stylePath = path.join(PATHS.LOADER, 'loader.styles.js');
+      fs.copyFileSync(stylePath, backupStylePath);
+      const styleJS = fs.readFileSync(stylePath);
+      const ejectedStyle = processTags(
+        'eject',
+        styleJS.toString('utf8'),
+        cliArgs
+      );
+      fs.writeFileSync(stylePath, ejectedStyle);
+      fs.unlinkSync(backupPath);
+      fs.unlinkSync(backupStylePath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.LOADER, 'Loader.bk.js');
+      const loaderJSPath = path.join(PATHS.LOADER, 'Loader.js');
+      fs.unlinkSync(loaderJSPath);
+      fs.renameSync(backupPath, loaderJSPath);
+      const backupStylePath = path.join(PATHS.LOADER, 'loader.styles.bk.js');
+      const stylePath = path.join(PATHS.LOADER, 'loader.styles.js');
+      fs.unlinkSync(stylePath);
+      fs.renameSync(backupStylePath, stylePath);
+    },
   },
   // /eject containers
   {
