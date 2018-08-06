@@ -1,5 +1,5 @@
 import React from 'react';
-// <!-- eject:replace with='import PropTypes from "prop-types";' -->
+// <!-- eject:replace with='import PropTypes from ${&#39;}prop-types${&#39;};' -->
 import { Layout } from 'antd';
 // <!-- /eject:replace -->
 import injectSheet from 'react-jss';
