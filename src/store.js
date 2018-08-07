@@ -5,8 +5,9 @@ import createHistory from 'history/createBrowserHistory';
 import rootReducer from './reducer';
 import { INTL_LOCALE } from './config';
 
+// <!-- eject:replace with='const BASE_NAME = ${&#39;}/${&#39;};' -->
 const BASE_NAME = window.indexad.PUBLIC_URL;
-
+// <!-- /eject:replace -->
 export const history = createHistory({ basename: BASE_NAME });
 const middlewares = [routerMiddleware(history), promiseMiddleware];
 // eslint-disable-next-line no-underscore-dangle
