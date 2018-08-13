@@ -4,13 +4,13 @@ module.exports = {
     ecmaVersion: 7,
     ecmaFeatures: {
       jsx: true,
-      experimentalObjectRestSpread: true
+      experimentalObjectRestSpread: true,
     },
-    sourceType: 'module'
+    sourceType: 'module',
   },
   env: {
     browser: true,
-    node: true
+    node: true,
   },
   extends: 'airbnb',
   parser: 'babel-eslint',
@@ -23,8 +23,8 @@ module.exports = {
         objects: 'always-multiline',
         imports: 'always-multiline',
         exports: 'always-multiline',
-        functions: 'ignore'
-      }
+        functions: 'ignore',
+      },
     ],
     strict: [2, 'never'],
     'react/jsx-uses-react': 2,
@@ -35,7 +35,8 @@ module.exports = {
     'no-unused-vars': 'error',
     'linebreak-style': 'off',
     'react/jsx-filename-extension': 'off',
-    'react/forbid-prop-types': 'off'
+    'react/forbid-prop-types': 'off',
+    'no-shadow': 'off',
   },
   settings: {
     'import/resolver': {
@@ -46,9 +47,9 @@ module.exports = {
           'webpack.config.' +
             (process.env.NODE_ENV !== 'production' ? 'dev' : 'prod') +
             '.js'
-        )
-      }
-    }
+        ),
+      },
+    },
   },
-  plugins: ['react', 'flowtype', 'import']
+  plugins: ['react', 'flowtype', 'import'],
 };
