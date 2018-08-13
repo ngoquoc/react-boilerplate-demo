@@ -1,4 +1,4 @@
 {
-  "apiServer": "https://webcore.omega-software.hr/index",
+  "apiServer": "http://5b7133cb586eb5001463a6fc.mockapi.io",
   "restApi": "vehicle/api"
 }
