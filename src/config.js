@@ -1,6 +1,10 @@
+import config from 'config.json';
+
 export const CACHEABLE_APIS = [];
 export const DEFAULT_API_FETCH_TIMEOUT = 10000;
-export const REST_API = '';
+// <!-- eject:replace with='export const REST_API = ${&#39;}/${&#39;}' -->
+export const REST_API = config.apiServer;
+// <!-- /eject:replace -->
 export const THEME_CONFIG = {
   // <!-- eject:remove -->
   panelColor: '#f8f8f8',

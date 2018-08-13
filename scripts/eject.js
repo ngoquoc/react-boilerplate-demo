@@ -116,6 +116,8 @@ const STEPS = {
   EJECT_APP_JS: 'eject app.js',
   EJECT_CONFIG_JS: 'eject config.js',
   EJECT_REDUCER_JS: 'eject reducer.js',
+  EJECT_SAGA_JS: 'eject saga.js',
+  EJECT_STORE_JS: 'eject store.js',
   EJECT_COMPONENTS: 'eject components',
   EJECT_FOOTER: 'eject Footer',
   EJECT_HEADER: 'eject Header',
@@ -405,6 +407,8 @@ const ejectSteps = [
       STEPS.EJECT_APP_JS,
       STEPS.EJECT_CONFIG_JS,
       STEPS.EJECT_REDUCER_JS,
+      STEPS.EJECT_SAGA_JS,
+      STEPS.EJECT_STORE_JS,
       STEPS.EJECT_COMPONENTS,
       STEPS.EJECT_CONTAINERS,
       STEPS.EJECT_HOCS,
@@ -484,6 +488,44 @@ const ejectSteps = [
       const reducerPath = path.join(PATHS.SRC, 'reducer.js');
       fs.unlinkSync(reducerPath);
       fs.renameSync(backupPath, reducerPath);
+    },
+  },
+  // / eject saga.js
+  {
+    name: STEPS.EJECT_SAGA_JS,
+    exec: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'saga.bk.js');
+      const sagaPath = path.join(PATHS.SRC, 'saga.js');
+      fs.copyFileSync(sagaPath, backupPath);
+      const js = fs.readFileSync(sagaPath);
+      const ejectedJS = processTags('eject', js.toString('utf8'), cliArgs);
+      fs.writeFileSync(sagaPath, ejectedJS);
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'saga.bk.js');
+      const sagaPath = path.join(PATHS.SRC, 'saga.js');
+      fs.unlinkSync(sagaPath);
+      fs.renameSync(backupPath, sagaPath);
+    },
+  },
+  // / eject store.js
+  {
+    name: STEPS.EJECT_STORE_JS,
+    exec: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'store.bk.js');
+      const storePath = path.join(PATHS.SRC, 'store.js');
+      fs.copyFileSync(storePath, backupPath);
+      const js = fs.readFileSync(storePath);
+      const ejectedJS = processTags('eject', js.toString('utf8'), cliArgs);
+      fs.writeFileSync(storePath, ejectedJS);
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'store.bk.js');
+      const storePath = path.join(PATHS.SRC, 'store.js');
+      fs.unlinkSync(storePath);
+      fs.renameSync(backupPath, storePath);
     },
   },
   // / eject components
