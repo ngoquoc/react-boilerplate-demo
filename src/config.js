@@ -1,8 +1,9 @@
+// <!-- eject:remove -->
 import config from 'config.json';
-
+// <!-- /eject:remove -->
 export const CACHEABLE_APIS = [];
 export const DEFAULT_API_FETCH_TIMEOUT = 10000;
-// <!-- eject:replace with='export const REST_API = ${&#39;}/${&#39;}' -->
+// <!-- eject:replace with='export const REST_API = ${&#39;}/${&#39;};' -->
 export const REST_API = config.apiServer;
 // <!-- /eject:replace -->
 export const THEME_CONFIG = {
