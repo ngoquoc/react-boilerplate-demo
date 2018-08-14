@@ -9,7 +9,7 @@ import styles from './header.styles';
 // <!-- eject:replace with='const Header = ({ classes }) => (' -->
 const Header = ({ classes, children }) => (
   // <!-- /eject:replace -->
-  // <!-- eject:replace with='  <div className={classes.header}><newline />    This is the header<newline />  </div>' -->
+  // <!-- eject:replace with='  <div className={classes.header}>${&#10;}    This is the header${&#10;}  </div>' -->
   <Layout.Header>
     <div
       className={classes.logo}
