@@ -70,7 +70,7 @@ const App = ({
       <UnauthenticatedLoginMenuItem key="4" />
     </Header>
     {/* <!-- /eject:replace --> */}
-    {/* <!-- eject:replace if='!args.multilingual' with='    <div>App content</div>' else='    <div><newline />      <Translation>App content: <newline />      </Translation>searchTitle: {searchTitle}, sellTitle: {sellTitle}<newline />    </div>' --> */}
+    {/* <!-- eject:replace if='!args.multilingual' with='    <div>App content</div>' else='    <div>${&#10;}      <Translation>App content: ${&#10;}      </Translation>searchTitle: {searchTitle}, sellTitle: {sellTitle}${&#10;}    </div>' --> */}
     <Layout.Content className={classes.content}>
       <Switch>
         <Route path="/" component={Vehicle} />
