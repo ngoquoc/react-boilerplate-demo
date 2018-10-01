@@ -1,6 +1,7 @@
 import { CACHEABLE_APIS, DEFAULT_API_FETCH_TIMEOUT, REST_API } from '../config';
+// <!-- eject:replace with='const MOCK_LOGGED_IN = true;' -->
 import { MOCK_LOGGED_IN } from '../mockData/apiData';
-
+// <!-- /eject:replace -->
 const RESULT_CACHES = {};
 const FETCHING = {};
 

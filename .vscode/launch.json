@@ -15,7 +15,7 @@
       "type": "node",
       "request": "launch",
       "name": "Debug eject script",
-      "program": "${workspaceFolder}\\scripts\\eject.js",
+      "program": "${workspaceFolder}/scripts/eject.js",
       "args": ["-n", "my name"],
       "console": "integratedTerminal"
     }

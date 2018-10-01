@@ -6,7 +6,7 @@ Once you have done that, this document is intended to guide you how to eject exa
 
 _NOTE: Please leave any unmentioned file/folder/component AS IS as modifying it will CAUSE UNEXPECTED EFFECTS to your app._
 
-**You can either eject the example using `npm run eject` or eject them using below steps.**
+**You can either eject the example using `npm run eject` and then `npm run format` or eject them using below steps.**
 
 ## Config
 

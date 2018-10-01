@@ -1,6 +1,6 @@
 const { log, processTags, finalizeArgs, execStep } = require('jsuti');
 const path = require('path');
-const fs = require('fs');
+const fs = require('fs-extra');
 const del = require('del');
 
 // configs
@@ -17,7 +17,12 @@ const possibleArgs = [
     name: 'name',
     arg: '--name',
     abbr: '-n',
-    default: undefined,
+    default: args => {
+      throw new Error(
+        'You must specify ejected app name (eg: --name New App Name) in order to eject this boilerplate.'
+      );
+      process.exit(9);
+    },
   },
 
   // App's short name
@@ -29,7 +34,9 @@ const possibleArgs = [
     name: 'shortName',
     arg: '--short-name',
     abbr: '-s',
-    default: args => args.name.split(' ')[0],
+    default: args => {
+      return args.name.split(' ')[0];
+    },
   },
 
   // App's package name
@@ -114,6 +121,7 @@ const STEPS = {
   EJECT_MANIFEST_JSON: 'eject manifest.json',
   EJECT_SRC: 'eject src',
   EJECT_APP_JS: 'eject app.js',
+  EJECT_INDEX_JS: 'eject index.js',
   EJECT_CONFIG_JS: 'eject config.js',
   EJECT_REDUCER_JS: 'eject reducer.js',
   EJECT_SAGA_JS: 'eject saga.js',
@@ -126,6 +134,7 @@ const STEPS = {
   EJECT_HOCS: 'eject HOCs',
   EJECT_INTL: 'eject intl',
   EJECT_MOCK_DATA: 'eject mockData',
+  EJECT_UTILS: 'eject utils',
 };
 /**
  * Path contants
@@ -163,6 +172,11 @@ const ejectSteps = [
     exec: (args, step) => {
       finalizeArgs(args, possibleArgs);
       args.multilingual = args.multilingual && args.multilingual !== 'false';
+      if (!args.name) {
+        throw new Error(
+          'You must specify ejected app name (eg: --name New App Name) in order to eject this boilerplate.'
+        );
+      }
     },
   },
   // eject package.json
@@ -394,6 +408,26 @@ const ejectSteps = [
       fs.renameSync(backupStylePath, stylePath);
     },
   },
+  // /eject index.js
+  {
+    name: STEPS.EJECT_INDEX_JS,
+    exec: async (args, step) => {
+      // eject index.js
+      const backupPath = path.join(PATHS.SRC, 'index.bk.js');
+      const indexJSPath = path.join(PATHS.SRC, 'index.js');
+      fs.copyFileSync(indexJSPath, backupPath);
+      const appJS = fs.readFileSync(indexJSPath);
+      const ejectedApp = processTags('eject', appJS.toString('utf8'), cliArgs);
+      fs.writeFileSync(indexJSPath, ejectedApp);
+      fs.unlinkSync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'index.bk.js');
+      const indexJSPath = path.join(PATHS.SRC, 'index.js');
+      fs.unlinkSync(indexJSPath);
+      fs.renameSync(backupPath, indexJSPath);
+    },
+  },
   // / eject config.js
   {
     name: STEPS.EJECT_CONFIG_JS,
@@ -474,11 +508,13 @@ const ejectSteps = [
   {
     name: STEPS.EJECT_COMPONENTS,
     exec: async (args, step) => {
-      // eject Translation
-      const backupPath = path.join(PATHS.COMPONENTS, 'Translation-bk');
-      const translationPath = path.join(PATHS.COMPONENTS, 'Translation');
-      fs.renameSync(translationPath, backupPath);
-      fs.mkdirSync(translationPath);
+      if (!args.multilingual) {
+        // eject Translation
+        const backupPath = path.join(PATHS.COMPONENTS, 'Translation-bk');
+        const translationPath = path.join(PATHS.COMPONENTS, 'Translation');
+        fs.renameSync(translationPath, backupPath);
+        fs.mkdirSync(translationPath);
+      }
       // eject index.js
       const indexBackupPath = path.join(PATHS.COMPONENTS, 'index.bk.js');
       const indexPath = path.join(PATHS.COMPONENTS, 'index.js');
@@ -486,16 +522,19 @@ const ejectSteps = [
       const js = fs.readFileSync(indexPath);
       const ejectedJS = processTags('eject', js.toString('utf8'), cliArgs);
       fs.writeFileSync(indexPath, ejectedJS);
-
-      del.sync(backupPath);
+      if (!args.multilingual) {
+        del.sync(backupPath);
+      }
       fs.unlinkSync(indexBackupPath);
     },
     undo: async () => {
-      // undo eject Translation
-      const backupPath = path.join(PATHS.COMPONENTS, 'Translation-bk');
-      const translationPath = path.join(PATHS.COMPONENTS, 'Translation');
-      del.sync(translationPath);
-      fs.renameSync(backupPath, translationPath);
+      if (!args.multilingual) {
+        // undo eject Translation
+        const backupPath = path.join(PATHS.COMPONENTS, 'Translation-bk');
+        const translationPath = path.join(PATHS.COMPONENTS, 'Translation');
+        del.sync(translationPath);
+        fs.renameSync(backupPath, translationPath);
+      }
       // undo index.js
       const indexBackupPath = path.join(PATHS.COMPONENTS, 'index.bk.js');
       const indexPath = path.join(PATHS.COMPONENTS, 'index.js');
@@ -729,6 +768,38 @@ const ejectSteps = [
       const mockDataPath = path.join(PATHS.SRC, 'mockData');
       del.sync(mockDataPath);
       fs.renameSync(backupPath, mockDataPath);
+    },
+  },
+  // /eject utils
+  {
+    name: STEPS.EJECT_UTILS,
+    exec: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'utils-bk');
+      const utilsPath = path.join(PATHS.SRC, 'utils');
+      fs.copySync(utilsPath, backupPath);
+
+      await Promise.all(
+        fs.readdirSync(utilsPath).map(async file => {
+          const filePath = path.join(utilsPath, file);
+          log(`<grey ejecting ${filePath}.../>`);
+          const utilJS = fs.readFileSync(filePath);
+          const ejectedUtil = processTags(
+            'eject',
+            utilJS.toString('utf8'),
+            cliArgs
+          );
+          await fs.writeFile(filePath, ejectedUtil);
+          log(`<grey ejected ${filePath}./>`);
+        })
+      );
+      log().write();
+      del.sync(backupPath);
+    },
+    undo: async (args, step) => {
+      const backupPath = path.join(PATHS.SRC, 'utils-bk');
+      const utilsPath = path.join(PATHS.SRC, 'utils');
+      del.sync(utilsPath);
+      fs.renameSync(backupPath, utilsPath);
     },
   },
 ];
