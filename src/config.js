@@ -19,8 +19,5 @@ export const THEME_CONFIG = {
 };
 // <!-- eject:remove if='!args.multilingual' -->
 export const INTL_LOCALE =
-  window.indexad.INTL_LOCALE ||
-  navigator.language ||
-  navigator.browserLanguage ||
-  'en-US';
+  navigator.language || navigator.browserLanguage || 'en-US';
 // <!-- /eject:remove -->

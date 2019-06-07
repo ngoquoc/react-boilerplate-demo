@@ -2,6 +2,7 @@ const { log, processTags, finalizeArgs, execStep } = require('jsuti');
 const path = require('path');
 const fs = require('fs-extra');
 const del = require('del');
+const { execSync } = require('child_process');
 
 // configs
 /**
